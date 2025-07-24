@@ -1,0 +1,16 @@
+{
+  "name": "blog_web_application",
+  "version": "1.0.0",
+  "description": "A dynamic website blog built using ejs, node.js, express.js. Will feature article creation, alteration, deletion and later storage in a database.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matthew Kleynhans",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}
