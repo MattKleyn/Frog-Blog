@@ -1,6 +1,29 @@
 <%- include("partials/header.ejs") %>
  
-    <h1>Hi there</h1>
-    
+    <% if (locals.title) { %>
+        <h1 id="title">
+            <%= title %>
+        </h1>
+        <p id="body">
+            <%=body%>
+        </p>
+        <h3 id="author">
+            <%=author%>
+        </h3>
+    <% } else { %>
+        <h1>no new articles, try creating one</h1>
+    <% } %>
+
+    <ol>
+        <li>article name</li>
+        <li>article name</li>
+        <li>article name</li>
+        <li>article name</li>
+        <li>article name</li>
+        <li>article name</li>
+    </ol>
+
+    <a href="/new_post_form">create new post</a>
+
 
 <%- include("partials/footer.ejs") %>
