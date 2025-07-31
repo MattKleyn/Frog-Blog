@@ -2,10 +2,16 @@
  
     <h1>Create new post</h1>
     <form action="/create_post" method="post">
-        <p id="title"><label>Article name: <input type="text" name="article_name"></label></p>
-        <p id="body"><label>Article body: <input type="text" name="article_body"></label></p> <!--check if text area is better semantically or functionally, instead of input-->
-        <p id="author"><label>Author name: <input type="text" name="author_name"></label></p>
-        <input type="submit" value="Create Post"> <!--should be button element?-->
+        <label id="title">Article name: 
+            <input type="text" name="title" required>
+        </label>
+        <label id="body">Article body: 
+            <textarea type="text" name="body" required></textarea> <!--Consider a way to upload a file for UX, also how to represent different sections, headings, images etc?-->
+        </label>
+        <label id="author">Author name: 
+            <input type="text" name="author" required>
+        </label>
+        <button type="submit" name="submit_new_article" value="new">Submit new article</button> <!--getting button name and value on submission too-->
     </form>
 
 <%- include("partials/footer.ejs") %>
