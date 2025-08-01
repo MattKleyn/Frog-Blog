@@ -1,7 +1,6 @@
 <%- include("partials/header.ejs") %>
  
-    <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
-        <p>There are currently <%= quantity %> articles to read.</p>
+    <% if (locals.title) { %> 
         <h1 id="title">
             <%= title %>
         </h1>
@@ -15,14 +14,6 @@
         <h1>No new articles to view. Be a Legend, and create one!</h1>
     <% } %>
 
-    <h2>All posts</h2>
-    <ol> <!--loop article titles, then make titles a link to then search and GET request that data.-->
-        <% recentPosts.forEach((posts) => { %>
-        <li> 
-            <%= posts.title %>
-        </li>
-        <% }) %>
-    </ol>
 
     <a href="/new_post_form">create new post</a>
 
