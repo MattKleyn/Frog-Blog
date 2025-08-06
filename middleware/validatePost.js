@@ -25,3 +25,17 @@ console.log(posts[1].title);
 console.log(myJSON[2].title);cant access JSON data directly, must turn into JS object first using .parse
 console.log(myJS.[0].title);
 */
+
+
+/*find and returns object in a array with matching property (exact value)*/
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) throw (err);
+        const jsObjectArray = JSON.parse(data);
+         
+        function myFunc(post) {
+            return post.title === "my frog";
+        }
+
+        console.log("does it work?", jsObjectArray.find(myFunc));
+
+    });

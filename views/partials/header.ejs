@@ -12,10 +12,13 @@
             <ul>
                 <li><a href="/">All articles</a></li>
                 <li><a href="/new_post_form">create new post</a></li>
-                <li>alter article</li>
-                <li>delete article</li>
-                <li>bleep boop</li>
+                <li><a href="/edit">Edit article</a></li>
+                <li><a href="/delete">Delete article</a></li>
             </ul>
+            <form action="/view" method="post">
+                <label><input type="text" name="search"></label>
+                <button type="submit">Search</button>
+            </form>
         </nav>
     </header>
     <main>

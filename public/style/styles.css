@@ -2,3 +2,13 @@ h1 {
     font-size: 3rem;
     color:green;
 }
+
+nav {
+    display: flex;
+
+    ul {
+        display: flex;
+        gap: 1rem;
+        list-style: none;
+    }
+}
