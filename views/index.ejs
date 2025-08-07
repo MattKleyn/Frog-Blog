@@ -19,7 +19,7 @@
     <ol> <!--loop article titles, then make titles a link to then search and GET request that data.-->
         <% recentPosts.forEach((posts) => { %>
         <li> 
-            <%= posts.title %>
+            <a href="/posts/<%=posts.id%>"><%= posts.title %></a>
         </li>
         <% }) %>
     </ol>

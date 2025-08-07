@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
-import { stringify } from "querystring";
+
 
 const app = express();
 const port = 3000;
@@ -23,9 +23,6 @@ app.delete("/delete", (req, res) => {
     res.render("view_post.ejs", data) 
 });
 
-
-
-
 /* need a form field to pass an argument, parse argument, search through array to find matching argument, display data. */
 /* Then user to make edit, click save button, parse through arguments, add back to array (at index what?), stringify array, write to file */
 /* display edit post form, Edit post, save, and display edited post pagedo as button on view article page*/
@@ -39,18 +36,46 @@ app.patch("/edit", (req, res) => {
     res.render("view_post.ejs", data) 
 });
 
+/* view article by homepage link, use article unique id */
+app.get("/posts/:id", (req, res) => {
 
-
-/* break after two searches??? */
-/* view article, using get request doesnt give valid form data, returns undefined*/
-app.post("/view", (req, res) => {
-    console.log("Displaying article");
+    console.log(req.params.id);
 
     fs.readFile("./data/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
-        const foundPost = jsObjectArray.find(post => post.title === req.body.search);
-        console.log(foundPost);
+        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
+
+        console.log("User searched for: ", foundPost);
+
+        if (!foundPost) {
+            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
+        };
+
+        const postInfo = {
+            title: foundPost.title,
+            body: foundPost.body,
+            author: foundPost.author
+        };
+
+        res.render("view_post.ejs", postInfo)        
+    });
+});
+
+/* Search bar, article by title, using Post req instead of get request, doesnt give valid form data, returns undefined*/
+app.post("/view", (req, res) => {
+
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) throw (err);
+        const jsObjectArray = JSON.parse(data);
+        const searchTerm = req.body.search.toLowerCase();
+        const foundPost = jsObjectArray.find(post => post.title.toLowerCase() === searchTerm);
+
+        console.log("User searched for: ", searchTerm);
+
+        if (!foundPost) {
+            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that title.", author: "Try searching something else"})
+        };
 
         const postInfo = {
             title: foundPost.title,
@@ -64,16 +89,21 @@ app.post("/view", (req, res) => {
 
 /*New post submission. Save, and display new post.*/
 app.post("/create_post", (req, res) => {
-    console.log("post request form data JS object: ", req.body);
 
     fs.readFile("./data/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
-        const jsObjectArray = JSON.parse(data);
-        jsObjectArray.push(req.body);
-        const obJS = JSON.stringify(jsObjectArray);
+        const id = Date.now().toString() + Math.floor(Math.random() * 1000);
+        const newPost = {
+            id: id,
+            title: req.body.title,
+            body: req.body.body,
+            author: req.body.author,
+        };
+        console.log(newPost);
 
-        /*console.log("jsArray.push: ", jsObjectArray);
-        console.log("pushed JS object stringify: ", obJS); */
+        const jsObjectArray = JSON.parse(data);
+        jsObjectArray.push(newPost);
+        const obJS = JSON.stringify(jsObjectArray);
 
         fs.writeFile("./data/posts.json", obJS, (err) => { 
             if (err) throw (err);
@@ -107,14 +137,6 @@ app.get("/", (req, res) => {
             quantity: arrayLength,
             recentPosts: jsObjectArray
         };
-
-        /*
-        console.log("read .json: ", data); 
-        console.log("array length: ", arrayLength);       
-        console.log(".json parsed: ", jsObjectArray);
-        console.log("latest Post: ", latestPost);
-        console.log("posts: ", posts);
-        */
 
         res.render("index.ejs", posts)
     });
