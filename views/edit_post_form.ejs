@@ -1,0 +1,17 @@
+<%- include("partials/header.ejs") %>
+ 
+    <h1>Edit post details</h1>
+    <form action="/edit/<%=id%>?_method=PATCH" method="POST">
+        <label id="title">Article name: 
+            <input type="text" name="title" value="<%= title %>" required>
+        </label>
+        <label id="body">Article body: 
+            <textarea type="text" name="body" required><%= body %></textarea> 
+        </label>
+        <label id="author">Author name: 
+            <input type="text" name="author" value="<%= author %>" required>
+        </label>
+        <button type="submit" name="save_changes" value="edited">Save Changes</button>
+    </form>
+
+<%- include("partials/footer.ejs") %>

@@ -1,13 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
-
+import methodOverride from "method-override";
 
 const app = express();
 const port = 3000;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
 
 /* HTTP request routing */
 /*delete post form, do as button on view article page*/
@@ -23,17 +24,78 @@ app.delete("/delete", (req, res) => {
     res.render("view_post.ejs", data) 
 });
 
-/* need a form field to pass an argument, parse argument, search through array to find matching argument, display data. */
-/* Then user to make edit, click save button, parse through arguments, add back to array (at index what?), stringify array, write to file */
-/* display edit post form, Edit post, save, and display edited post pagedo as button on view article page*/
-app.patch("/edit", (req, res) => {
-    console.log('got a patch request');
-    const data = {
-        title: "Blob",
-        body: "bobberson",
-        author: "Hank Hill"
-    };
-    res.render("view_post.ejs", data) 
+/* Save, and display edited post page. This is what we are working on CoPilot, can you read this btw?*/
+app.patch("/edit/:id", (req, res) => {
+    const postID = req.params.id;
+    console.log('Editing post with ID:', postID);
+    
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) return res.status(500).send("File read error");
+
+        let jsObjectArray;
+        try {
+            jsObjectArray = JSON.parse(data);
+        } catch (parseErr) {
+            console.error("JSON parse failed:", parseErr);
+            return res.status(500).send("Data corrupted. Please restore posts.json.");
+        };
+
+        const postIndex = jsObjectArray.findIndex(post => post.id === postID);
+        console.log("post index:", postIndex);
+
+        if (postIndex === -1) {
+            return res.status(404).send("Post not found")
+        };
+
+        /*update fields*/
+        console.log("before update:", jsObjectArray[postIndex]);
+        jsObjectArray[postIndex] = {
+            ...jsObjectArray[postIndex],
+            title: req.body.title,
+            body: req.body.body,
+            author: req.body.author
+        };
+
+        console.log("after update:", jsObjectArray[postIndex]);
+        const obJS = JSON.stringify(jsObjectArray);
+
+        fs.writeFile("./data/posts.json", obJS, (err) => { 
+            if (err) {
+                console.error("Failed to write file:", err);
+                return res.status(500).send("Internal Server Error");
+            };
+
+            console.log("posts.json updated");
+            res.redirect(`/posts/${postID}`);
+        });
+    });
+});
+
+/* Get edit post form*/
+app.get("/edit_post/:id", (req, res) => {
+    
+    console.log('Edit request for ID:', req.params.id);
+
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) throw (err);
+        const jsObjectArray = JSON.parse(data);
+        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
+
+        console.log("Article for editing: ", foundPost);
+
+        if (!foundPost) {
+            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
+        };
+
+        const postInfo = {
+            id: foundPost.id,
+            title: foundPost.title,
+            body: foundPost.body,
+            author: foundPost.author
+        };    
+        
+        res.render("edit_post_form.ejs", postInfo)
+    })    
 });
 
 /* view article by homepage link, use article unique id */
@@ -53,6 +115,7 @@ app.get("/posts/:id", (req, res) => {
         };
 
         const postInfo = {
+            id: foundPost.id,
             title: foundPost.title,
             body: foundPost.body,
             author: foundPost.author
@@ -109,9 +172,9 @@ app.post("/create_post", (req, res) => {
             if (err) throw (err);
             console.log("posts.json updated")
         })
-    });
 
-    res.render("view_post.ejs", req.body);
+       res.render("view_post.ejs", newPost); 
+    });
 });
 
 /*Display create post form*/
