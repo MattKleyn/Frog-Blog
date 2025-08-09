@@ -1,0 +1,20 @@
+<%- include("partials/header.ejs") %>
+ 
+    <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
+        <h1>Delete post</h1>
+        <p>Hi there, you are about to delete post "<%= title %>".</p> 
+        <p>Are you sure you want to proceed?</p>
+        <form action="/delete_post/<%=id%>?_method=DELETE" method="POST">
+            <button type="submit" name="delete_article" value="deleted">
+                Confirm delete
+            </button> 
+            <a href="/posts/<%=id%>">Cancel</a>
+        </form>
+    <% } else { %>
+        <h1>Article deleted. Visit the home page to view other articles, alternatively take the time to create a new article.</h1>
+        <a href="/">Home page</a>
+        <a href="/new_post_form">create new post</a>
+        <a href="">Undo delete</a> <!--still to do logic for undo delete-->
+    <% } %>
+
+<%- include("partials/footer.ejs") %>

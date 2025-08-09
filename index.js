@@ -11,17 +11,78 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 
 /* HTTP request routing */
-/*delete post form, do as button on view article page*/
-app.delete("/delete", (req, res) => {
-    console.log('got a delete request');
+/*delete and archive post.*/
+app.delete("/delete_post/:id", (req, res) => {
+    console.log("Starting deletion:", req.params.id);
 
-    /* splice or toSpliced method seems suitable */
-    const data = {
-        title: "delete",
-        body: "delete",
-        author: "delete"
-    };
-    res.render("view_post.ejs", data) 
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) throw (err);
+        const jsObjectArray = JSON.parse(data);
+        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
+        const postIndex = jsObjectArray.findIndex(post => post.id === req.params.id);
+
+        console.log("deleting object:", foundPost);
+        console.log("deleting at index:", postIndex);
+
+        if (!foundPost) {
+            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
+        };
+
+        if (postIndex === -1) {
+            return res.status(404).send("Post not found")
+        };
+
+        /*if not cancel and 10s elapses then remove post and archive, else break*/
+        console.log("before: ",jsObjectArray);
+        jsObjectArray.splice(postIndex,1);
+        console.log("after: ",jsObjectArray);
+        const updatedArray = JSON.stringify(jsObjectArray);
+
+        fs.writeFile("./data/posts.json", updatedArray, (err) => { 
+            if (err) throw (err);
+            console.log("posts.json updated")
+        });
+        
+        fs.readFile("./data/deleted_posts.json", "utf-8", (err, ddata) => {
+            if (err) throw (err);
+            console.log("archiving: ", foundPost);
+            const archiveObject = JSON.parse(ddata);
+            archiveObject.push(foundPost);
+            const archive = JSON.stringify(archiveObject);
+
+            fs.writeFile("./data/deleted_posts.json", archive, (err) => { 
+                if (err) throw (err);
+                console.log("archive updated")
+            });
+        });
+
+        res.render("delete_post.ejs", req.params)  
+    });
+});
+
+/* get delete confirm form */
+app.get("/delete_form/:id", (req, res) => {
+    console.log("Delete request for ID:", req.params.id);
+
+    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+        if (err) throw (err);
+        const jsObjectArray = JSON.parse(data);
+        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
+        console.log("delete request:", foundPost);
+
+        if (!foundPost) {
+            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
+        };
+
+        const postInfo = {
+            id: foundPost.id,
+            title: foundPost.title,
+            body: foundPost.body,
+            author: foundPost.author
+        };
+
+        res.render("delete_post.ejs", postInfo)  
+    })
 });
 
 /* Save, and display edited post page. This is what we are working on CoPilot, can you read this btw?*/
