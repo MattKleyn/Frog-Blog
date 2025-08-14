@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/style/styles.css">
-    <title>Dev Frog Blog</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/new_post_form">create new post</a></li>
-                <li><a href="">Categories</a></li>
-                <li><a href="">Sign Up/Login</a></li>
-            </ul>
-            <form action="/view" method="post">
-                <label><input type="text" name="search"></label>
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
-    <main>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style/styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <title>Dev Frog Blog</title>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <img src="" alt="Blog logo">
+                <div>
+                    <form action="/view" method="post">
+                        <label><input type="text" name="search" placeholder="Search by Title"></label>
+                        <button type="submit" class="button_style">Search</button>
+                    </form>                
+                    <ul>
+                        <li><a href="/" class="nav_link">Home</a></li>
+                        <li><a href="/new_post_form">create new post</a></li>
+                        <li><a href="">Categories</a></li>
+                        <li><a href="">Sign Up/Login</a></li>
+                    </ul>
+
+                </div>
+            </nav>
+        </header>
+        <main class="home_main">

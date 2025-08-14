@@ -3,3 +3,7 @@ node_modules/
 
 #ignore frontend design inspiration board
 moodboard/
+
+#ignores .html test files for styling 
+test.html
+20250705_103241.jpg

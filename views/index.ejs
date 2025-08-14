@@ -1,30 +1,41 @@
 <%- include("partials/header.ejs") %>
- 
+    
     <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
-        <p>There are currently <%= quantity %> articles to read.</p>
-        <h1 id="title">
-            <%= title %>
-        </h1>
-        <p id="body">
+    <section class="headline_article">
+        <div class="hero">
+            <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="hero_image">
+            <h1 class="hero_title">
+                <%= title %>
+            </h1>
+            <h3 class="hero_author">
+                <%=author%>
+            </h3>
+        </div>
+        <p class="body">
             <%=body%>
         </p>       
-        <h3 id="author">
-            <%=author%>
-        </h3>
+    </section>    
     <% } else { %>
+    <section class="front_page_article">
         <h1>No new articles to view. Be a Legend, and create one!</h1>
+    </section>
     <% } %>
-
-    <h2>All posts</h2>
-    <ol> <!--loop article titles, then make titles a link to then search and GET request that data.-->
-        <% recentPosts.forEach((posts) => { %>
-        <li> 
-            <a href="/posts/<%=posts.id%>"><%= posts.title %></a>
-        </li>
-        <% }) %>
-    </ol>
-
-    <a href="/new_post_form">create new post</a>
-
-
+    
+    <article class="article_sidebar">
+        <h2>Recent Articles</h2>
+        <p>There are currently <%= quantity %> articles to read.</p>
+        <ul>
+            <% recentPosts.forEach((posts) => { %>
+            <li> 
+                <a href="/posts/<%=posts.id%>">
+                    <img src="" alt="">
+                    <h3><%= posts.title %></h3>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Culpa incidunt ad nemo, cupiditate velit itaque laborum modi corrupti placeat non iste illum quidem, illo exercitationem odio nam veniam id harum.</p>
+                    <h4><%=posts.author%></h4>
+                </a>
+            </li>
+            <% }) %>
+        </ul>   
+    </article>
+    
 <%- include("partials/footer.ejs") %>

@@ -1,23 +1,46 @@
 <%- include("partials/header.ejs") %>
  
+    <section class="article">
     <% if (locals.title) { %> 
-        <h1 id="title">
-            <%= title %>
-        </h1>
-        <p id="body">
-            <%=body%>
-        </p>       
-        <h3 id="author">
-            <%=author%>
-        </h3>
+        <div class="article_head">
+            <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="article_image">
+            <h1 class="title">
+                <%= title %>
+            </h1>
+            <h3 class="author">
+                <%=author%>
+            </h3>
+        </div>
+        <div class="main_content">   
+            <div class="content">
+                <p class="body">
+                    <%=body%>
+                </p>   
+            
     <% } else { %>
         <h1>No new articles to view. Be a Legend, and create one!</h1>
     <% } %>
 
-
-    <a href="/new_post_form">create new post</a>
-    <a href="/edit_post/<%=id%>">Edit article</a>
-    <a href="/delete_form/<%=id%>">Delete article</a>
-
-
+                <div class="crud">
+                    <a href="/new_post_form" class="button_style">create new post</a>
+                    <a href="/edit_post/<%=id%>" class="button_style">Edit article</a>
+                    <a href="/delete_form/<%=id%>" class="button_style">Delete article</a>
+                </div>
+            </div>
+    
+            <article class="author_sidebar">
+                <h2>Author Bio</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur repellat nemo aliquam voluptas laboriosam, suscipit sapiente, laudantium hic pariatur explicabo consequuntur perferendis facere. Aspernatur omnis nesciunt itaque officia eveniet quasi?</p>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, officia doloremque velit incidunt at suscipit expedita animi. Quaerat cupiditate officia voluptate repellat, consequuntur doloribus asperiores laborum, quasi libero ex architecto.</p>
+                <ul>
+                    <li> 
+                        <a href="">
+                            <h3>posts title</h3>
+                        </a>
+                    </li>
+                </ul>   
+                <img src="" alt+="profile pic">
+            </article>
+        </div>
+    </section>
 <%- include("partials/footer.ejs") %>
