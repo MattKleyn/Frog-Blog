@@ -1,41 +1,48 @@
 <%- include("partials/header.ejs") %>
     
-    <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
-    <section class="headline_article">
-        <div class="hero">
-            <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="hero_image">
-            <h1 class="hero_title">
-                <%= title %>
-            </h1>
-            <h3 class="hero_author">
-                <%=author%>
-            </h3>
-        </div>
-        <p class="body">
-            <%=body%>
-        </p>       
-    </section>    
-    <% } else { %>
-    <section class="front_page_article">
-        <h1>No new articles to view. Be a Legend, and create one!</h1>
+    <section class="newspaper_head">
+        <h1 class="newspaper_name">Dev frog blog</h1>
+        <p>contact info/socials</p>
+        <h4>Date now</h4>
     </section>
-    <% } %>
-    
-    <article class="article_sidebar">
-        <h2>Recent Articles</h2>
-        <p>There are currently <%= quantity %> articles to read.</p>
-        <ul>
-            <% recentPosts.forEach((posts) => { %>
-            <li> 
-                <a href="/posts/<%=posts.id%>">
-                    <img src="" alt="">
-                    <h3><%= posts.title %></h3>
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Culpa incidunt ad nemo, cupiditate velit itaque laborum modi corrupti placeat non iste illum quidem, illo exercitationem odio nam veniam id harum.</p>
-                    <h4><%=posts.author%></h4>
-                </a>
-            </li>
-            <% }) %>
-        </ul>   
-    </article>
-    
+
+    <div class="main_styles">
+        <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
+        <section class="headline_article">
+            <div class="hero">
+                <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="hero_image">
+                <h1 class="hero_title">
+                    <%= title %>
+                </h1>
+                <h3 class="hero_author">
+                    <%=author%>
+                </h3>
+            </div>
+            <p class="body">
+                <%=body%>
+            </p>       
+        </section>    
+        <% } else { %>
+        <section class="front_page_article">
+            <h1>No new articles to view. Be a Legend, and create one!</h1>
+        </section>
+        <% } %>
+        
+        <article class="article_sidebar">
+            <h2>Recent Articles</h2>
+            <p>There are currently <%= quantity %> articles to read.</p>
+            <ul>
+                <% recentPosts.forEach((posts) => { %>
+                <li> 
+                    <a href="/posts/<%=posts.id%>">
+                        <img src="" alt="">
+                        <h3><%= posts.title %></h3>
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Culpa incidunt ad nemo, cupiditate velit itaque laborum modi corrupti placeat non iste illum quidem, illo exercitationem odio nam veniam id harum.</p>
+                        <h4><%=posts.author%></h4>
+                    </a>
+                </li>
+                <% }) %>
+            </ul>   
+        </article>
+    </div>
 <%- include("partials/footer.ejs") %>

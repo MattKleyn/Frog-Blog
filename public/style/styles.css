@@ -17,7 +17,7 @@
 }
 
 @layer base {
-    /*color variables*/
+    /*color, typeface variables*/
     :root {
         --text-light: #EAEAEA;
         --text-dark: #2E2B2C;
@@ -28,6 +28,7 @@
         --fontfamily-body: "Montserrat", sans-serif;
         --fontfamily-heading-main: "Bebas Neue", sans-serif;
         --fontfamily-heading-secondary: "Montserrat", sans-serif;
+        --fontfamily-newspaper-name: "Bevan", serif;
     }
 
     main {
@@ -59,21 +60,17 @@
                     list-style: none;
                 }
             }    
-
-            form {
-                input {
-                    padding: 0.5rem 1.5rem;
-                    border-radius: 0.5rem; /*increases border line size for some reason*/
-                    font-size: 1rem;
-                }
-
-            }
         }
     }
 }
 
 @layer components {
-    /*buttons, links, headings, paragraoh*/
+    /*global component styles*/
+    .newspaper_name {
+        font-family: var(--fontfamily-newspaper-name);
+        font-size: 8rem;
+        text-transform: uppercase;
+    }
 
     h1 {
         font-family: var(--fontfamily-heading-main);
@@ -116,7 +113,35 @@
         color: var(--text-dark);
     }
 
+    .input_field {
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem; /*increases border line size for some reason*/
+        font-size: 1rem;
+        width: 40rem;
+    }
+
+    .input_text-body {
+        width: 82rem;
+        height: 45rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        font-family: var(--fontfamily-body);
+    }
+
     .button_style {
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--accent-dark);
+        background-color: var(--background-dark);
+        color: var(--text-light);
+        font-size: 1rem;
+                        
+            &:hover {
+                background-color: var(--accent-light);
+            }
+    }
+
+    .button_style-ghost {
         padding: 0.5rem 1.5rem;
         border-radius: 0.5rem;
         border: 1px solid var(--accent-dark);
@@ -127,16 +152,34 @@
             }
     }
 
+    .newspaper_head {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        border-top: 0.5rem solid var(--accent-dark);
+        border-bottom: 0.5rem solid var(--accent-dark);
+    }
+
+    /*home page styles*/
     .home_main {
         padding: 3rem 4rem;
         display: flex;
+        flex-direction: column;
         gap: 2rem;
 
-        & > .headline_article {
-            width: 75%;
+        .main_styles {
+            padding: 3rem 4rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .headline_article {
+            width: 80%;
             min-height: 100vh;
 
-            & > .hero {
+            .hero {
               display: flex;
               flex-direction: column;
               
@@ -159,16 +202,18 @@
         }
 
         .article_sidebar, .author_sidebar {
-            width: 25%;
+            width: 20%;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            padding: 2rem;
                     
             li {
                 list-style: none;
             }
         }
 
+        /*view article styles*/
         .article {
             .article_head img{
                 width: 100%;
@@ -198,9 +243,45 @@
                 .crud {
                     margin-top: 1rem;
                     text-align: end;
-                    
-
                 }
+            }
+        }
+
+        /*create, edit post styles*/
+        .post_details {
+            display: flex;
+            flex-direction: column;
+
+            form {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 1rem;
+
+                div {
+                    display: flex;
+                    gap: 1rem;
+                }
+            }
+        }
+
+        /*delete confirm forms*/
+        .delete_confirm {
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            align-items: center;
+
+            form {
+                width: min-content;
+            }
+
+            .title_confirm {
+                font-family: var(--fontfamily-heading-secondary);
+                font-size: 2rem;
+                line-height: 145%;
+                font-weight: 500;
+                color: var(--text-dark);
             }
         }
     }

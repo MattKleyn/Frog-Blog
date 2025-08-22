@@ -1,20 +1,22 @@
 <%- include("partials/header.ejs") %>
- 
+
+    <section class="post_details delete_confirm">
     <% if (locals.title) { %> <!--if use (locals.data) then doesnt work-->
         <h1>Delete post</h1>
-        <p>Hi there, you are about to delete post "<%= title %>".</p> 
+        <p>Hi there, you are about to delete post <span class="title_confirm">"<%= title %>"</span>.</p> 
         <p>Are you sure you want to proceed?</p>
         <form action="/delete_post/<%=id%>?_method=DELETE" method="POST">
-            <button type="submit" name="delete_article" value="deleted">
+            <button type="submit" name="delete_article" value="deleted" class="button_style">
                 Confirm delete
             </button> 
-            <a href="/posts/<%=id%>">Cancel</a>
+            <a href="/posts/<%=id%>" class="button_style-ghost">Cancel</a>
         </form>
     <% } else { %>
         <h1>Article deleted. Visit the home page to view other articles, alternatively take the time to create a new article.</h1>
-        <a href="/">Home page</a>
-        <a href="/new_post_form">create new post</a>
-        <a href="">Undo delete</a> <!--still to do logic for undo delete-->
+        <a href="/" class="button_style-ghost">Home page</a>
+        <a href="/new_post_form" class="button_style-ghost">create new post</a>
+        <a href="" class="button_style-ghost">Undo delete</a> <!--still to do logic for undo delete-->
     <% } %>
+    </section>
 
 <%- include("partials/footer.ejs") %>
