@@ -7,3 +7,6 @@ moodboard/
 #ignores .html test files for styling 
 test.html
 20250705_103241.jpg
+
+#ignores promises and async/await practice file
+practice.js

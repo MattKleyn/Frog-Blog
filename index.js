@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
+import getHomePageViewModel from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -245,25 +246,16 @@ app.get("/new_post_form", (req, res) => {
 });
 
 /*Display Home page*/
-app.get("/", (req, res) => {
-    console.log("Display homepage");
-   
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
-        if (err) throw (err);
-        const jsObjectArray = JSON.parse(data);
-        const arrayLength = [jsObjectArray.length];
-        const latestPost = jsObjectArray[arrayLength - 1];
-
-        const posts = {
-            title: latestPost.title,
-            body: latestPost.body,
-            author: latestPost.author,
-            quantity: arrayLength,
-            recentPosts: jsObjectArray
-        };
-
-        res.render("index.ejs", posts)
-    });
+app.get("/", async (req, res) => {
+    try{
+        console.log("Display homepage");
+        const posts = await getHomePageViewModel();
+        
+        res.render("index.ejs", posts);
+    } catch(err) {
+        console.error("Failed to load posts:", err);
+        res.status(500).send("Could not load posts")
+    };
 });
 
 /*Server connection*/
