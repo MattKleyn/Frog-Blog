@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
-import getHomePageViewModel from "./service_access_layer/services.js";
+import {getHomePageViewModel, getNewPostFormModel} from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -16,7 +16,7 @@ app.use(methodOverride("_method"));
 app.delete("/delete_post/:id", (req, res) => {
     console.log("Starting deletion:", req.params.id);
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
         const foundPost = jsObjectArray.find(post => post.id === req.params.id);
@@ -39,19 +39,19 @@ app.delete("/delete_post/:id", (req, res) => {
         console.log("after: ",jsObjectArray);
         const updatedArray = JSON.stringify(jsObjectArray);
 
-        fs.writeFile("./data/posts.json", updatedArray, (err) => { 
+        fs.writeFile("./databases/posts.json", updatedArray, (err) => { 
             if (err) throw (err);
             console.log("posts.json updated")
         });
         
-        fs.readFile("./data/deleted_posts.json", "utf-8", (err, ddata) => {
+        fs.readFile("./databases/deleted_posts.json", "utf-8", (err, ddata) => {
             if (err) throw (err);
             console.log("archiving: ", foundPost);
             const archiveObject = JSON.parse(ddata);
             archiveObject.push(foundPost);
             const archive = JSON.stringify(archiveObject);
 
-            fs.writeFile("./data/deleted_posts.json", archive, (err) => { 
+            fs.writeFile("./databases/deleted_posts.json", archive, (err) => { 
                 if (err) throw (err);
                 console.log("archive updated")
             });
@@ -65,7 +65,7 @@ app.delete("/delete_post/:id", (req, res) => {
 app.get("/delete_form/:id", (req, res) => {
     console.log("Delete request for ID:", req.params.id);
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
         const foundPost = jsObjectArray.find(post => post.id === req.params.id);
@@ -91,7 +91,7 @@ app.patch("/edit/:id", (req, res) => {
     const postID = req.params.id;
     console.log('Editing post with ID:', postID);
     
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) return res.status(500).send("File read error");
 
         let jsObjectArray;
@@ -121,7 +121,7 @@ app.patch("/edit/:id", (req, res) => {
         console.log("after update:", jsObjectArray[postIndex]);
         const obJS = JSON.stringify(jsObjectArray);
 
-        fs.writeFile("./data/posts.json", obJS, (err) => { 
+        fs.writeFile("./databases/posts.json", obJS, (err) => { 
             if (err) {
                 console.error("Failed to write file:", err);
                 return res.status(500).send("Internal Server Error");
@@ -138,7 +138,7 @@ app.get("/edit_post/:id", (req, res) => {
     
     console.log('Edit request for ID:', req.params.id);
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
         const foundPost = jsObjectArray.find(post => post.id === req.params.id);
@@ -165,7 +165,7 @@ app.get("/posts/:id", (req, res) => {
 
     console.log(req.params.id);
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
         const foundPost = jsObjectArray.find(post => post.id === req.params.id);
@@ -190,7 +190,7 @@ app.get("/posts/:id", (req, res) => {
 /* Search bar, article by title, using Post req instead of get request, doesnt give valid form data, returns undefined*/
 app.post("/view", (req, res) => {
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const jsObjectArray = JSON.parse(data);
         const searchTerm = req.body.search.toLowerCase();
@@ -215,7 +215,7 @@ app.post("/view", (req, res) => {
 /*New post submission. Save, and display new post.*/
 app.post("/create_post", (req, res) => {
 
-    fs.readFile("./data/posts.json", "utf-8", (err, data) => {
+    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
         if (err) throw (err);
         const id = Date.now().toString() + Math.floor(Math.random() * 1000);
         const newPost = {
@@ -230,7 +230,7 @@ app.post("/create_post", (req, res) => {
         jsObjectArray.push(newPost);
         const obJS = JSON.stringify(jsObjectArray);
 
-        fs.writeFile("./data/posts.json", obJS, (err) => { 
+        fs.writeFile("./databases/posts.json", obJS, (err) => { 
             if (err) throw (err);
             console.log("posts.json updated")
         })
@@ -240,9 +240,15 @@ app.post("/create_post", (req, res) => {
 });
 
 /*Display create post form*/
-app.get("/new_post_form", (req, res) => {
-    console.log("Display create post form");
-    res.render("new_post_form.ejs")
+app.get("/new_post_form", async(req, res) => {
+    try {
+        console.log("Display create post form");
+        const posts = await getNewPostFormModel();
+        res.render("new_post_form.ejs", posts);   
+    } catch (err) {
+        console.error("Failed to render new post form:", err);
+        res.status(500).send("Could not load new post form")
+    };
 });
 
 /*Display Home page*/
