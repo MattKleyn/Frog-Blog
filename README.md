@@ -83,9 +83,10 @@ Middleware and utilities
 Coming soon as part of phase 2 refactor.
 
 **Known Issues / Limitations**
-Currently there is a regression with the search by title `/view` GET route.
+Currently there are no regressions.
 Currently the search function is limited to using the entire title but is not caps sensitive. Additional filter parameters to come.
 Phase 2 is a codebase refactor to keep it DRY, creating shared middleware and utilities. A clear separation of concerns also involved. The site works but now it needs to be streamlined.
+Proper testing and input validation and sanitization required.
 
 **Problems & Solutions**
 Currently a WIP but will be a great place to journal and share experiences while learning in the tech section. The content will be skill and experience agnostic. A place for all to gather and hopefully gain some semblance of mentorship and guidance in this harsh job climate.

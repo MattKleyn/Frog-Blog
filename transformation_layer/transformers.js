@@ -11,3 +11,7 @@ export const getLatestPost = (posts) => {
 export const getId = () => {
     return Date.now().toString() + Math.floor(Math.random() * 1000)
 };
+
+export const findByTitle = (posts, searchTerm) => { 
+    return posts.find(post => post.title.toLowerCase() === searchTerm);
+};

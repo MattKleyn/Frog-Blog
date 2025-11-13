@@ -1,5 +1,22 @@
 import { getData, writeToDB } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId } from "../transformation_layer/transformers.js";
+import { getArrayLength, getLatestPost, getId, findByTitle } from "../transformation_layer/transformers.js";
+
+export const searchByTitleModel = async(data) => {
+            const jsObjectArray = await getData();
+            const foundPost = findByTitle(jsObjectArray, data);
+    
+            if (!foundPost) {
+                return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that title.", author: "Try searching something else"})
+            };
+    
+           return {
+                id: foundPost.id,
+                title: foundPost.title,
+                body: foundPost.body,
+                author: foundPost.author
+            };
+        
+};
 
 /*create post */
 export const createNewPost = async(data) => {
