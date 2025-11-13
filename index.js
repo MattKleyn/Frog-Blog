@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
-import {getHomePageViewModel, getNewPostFormModel} from "./service_access_layer/services.js";
+import {getHomePageViewModel, getNewPostFormModel, createNewPost} from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -213,30 +213,16 @@ app.post("/view", (req, res) => {
 });
 
 /*New post submission. Save, and display new post.*/
-app.post("/create_post", (req, res) => {
-
-    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
-        if (err) throw (err);
-        const id = Date.now().toString() + Math.floor(Math.random() * 1000);
-        const newPost = {
-            id: id,
-            title: req.body.title,
-            body: req.body.body,
-            author: req.body.author,
-        };
-        console.log(newPost);
-
-        const jsObjectArray = JSON.parse(data);
-        jsObjectArray.push(newPost);
-        const obJS = JSON.stringify(jsObjectArray);
-
-        fs.writeFile("./databases/posts.json", obJS, (err) => { 
-            if (err) throw (err);
-            console.log("posts.json updated")
-        })
-
-       res.render("view_post.ejs", newPost); 
-    });
+app.post("/create_post", async(req, res) => {
+    try{
+        const userInput = req.body;
+        const newPost = await createNewPost(userInput);
+        res.render("view_post.ejs", newPost); 
+    } catch(err) {
+        console.error("Failed to render new post:", err);
+        res.status(500).send("Could not load new post")
+        /*need to include failed to write err */
+    };
 });
 
 /*Display create post form*/
