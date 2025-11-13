@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
-import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel} from "./service_access_layer/services.js";
+import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel, searchByIdModel } from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -161,30 +161,16 @@ app.get("/edit_post/:id", (req, res) => {
 });
 
 /* view article by homepage link, use article unique id */
-app.get("/posts/:id", (req, res) => {
-
-    console.log(req.params.id);
-
-    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
-        if (err) throw (err);
-        const jsObjectArray = JSON.parse(data);
-        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
-
-        console.log("User searched for: ", foundPost);
-
-        if (!foundPost) {
-            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
-        };
-
-        const postInfo = {
-            id: foundPost.id,
-            title: foundPost.title,
-            body: foundPost.body,
-            author: foundPost.author
-        };
-
-        res.render("view_post.ejs", postInfo)        
-    });
+app.get("/posts/:id", async(req, res) => {
+    try{
+        console.log("User searched for id:", req.params.id);      
+        const searchId = req.params.id;
+        const postInfo = await searchByIdModel(searchId);
+        res.render("view_post.ejs", postInfo);
+    } catch(err) {
+        console.error("Failed to render requested post:", err);
+        res.status(500).send("Could not load post")
+    };
 });
 
 /* Search bar, article by title, using Post req instead of get request, doesnt give valid form data, returns undefined*/

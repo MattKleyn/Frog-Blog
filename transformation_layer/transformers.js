@@ -15,3 +15,7 @@ export const getId = () => {
 export const findByTitle = (posts, searchTerm) => { 
     return posts.find(post => post.title.toLowerCase() === searchTerm);
 };
+
+export const findById = (posts, searchId) => {
+    return posts.find(post => post.id === searchId);
+};
