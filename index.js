@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
-import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel, searchByIdModel } from "./service_access_layer/services.js";
+import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel, searchByIdModel, editPostModel } from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -75,50 +75,17 @@ app.get("/delete_form/:id", async(req, res) => {
 });
 
 /* Save, and display edited post page. This is what we are working on CoPilot, can you read this btw?*/
-app.patch("/edit/:id", (req, res) => {
-    const postID = req.params.id;
-    console.log('Editing post with ID:', postID);
-    
-    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
-        if (err) return res.status(500).send("File read error");
-
-        let jsObjectArray;
-        try {
-            jsObjectArray = JSON.parse(data);
-        } catch (parseErr) {
-            console.error("JSON parse failed:", parseErr);
-            return res.status(500).send("Data corrupted. Please restore posts.json.");
-        };
-
-        const postIndex = jsObjectArray.findIndex(post => post.id === postID);
-        console.log("post index:", postIndex);
-
-        if (postIndex === -1) {
-            return res.status(404).send("Post not found")
-        };
-
-        /*update fields*/
-        console.log("before update:", jsObjectArray[postIndex]);
-        jsObjectArray[postIndex] = {
-            ...jsObjectArray[postIndex],
-            title: req.body.title,
-            body: req.body.body,
-            author: req.body.author
-        };
-
-        console.log("after update:", jsObjectArray[postIndex]);
-        const obJS = JSON.stringify(jsObjectArray);
-
-        fs.writeFile("./databases/posts.json", obJS, (err) => { 
-            if (err) {
-                console.error("Failed to write file:", err);
-                return res.status(500).send("Internal Server Error");
-            };
-
-            console.log("posts.json updated");
-            res.redirect(`/posts/${postID}`);
-        });
-    });
+app.patch("/edit/:id", async(req, res) => {
+    try{
+        const searchId = req.params.id;
+        const userInput = req.body;
+        console.log('Editing post with ID:', searchId);
+        const postInfo = await editPostModel(searchId, userInput);
+        res.redirect(`/posts/${postInfo}`);
+    } catch(err) {
+        console.error("Failed to render requested post:", err);
+        res.status(500).send("Could not load post")
+    };
 });
 
 /* Get edit post form*/

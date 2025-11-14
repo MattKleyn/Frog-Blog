@@ -19,3 +19,7 @@ export const findByTitle = (posts, searchTerm) => {
 export const findById = (posts, searchId) => {
     return posts.find(post => post.id === searchId);
 };
+
+export const findByIndex = (posts, searchId) => {
+    return posts.findIndex(post => post.id === searchId);
+};

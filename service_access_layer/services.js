@@ -1,5 +1,33 @@
 import { getData, writeToDB } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById } from "../transformation_layer/transformers.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex } from "../transformation_layer/transformers.js";
+
+/* edit post submit */
+export const editPostModel = async(searchId, userInput) => {
+    const jsObjectArray = await getData();
+
+    const postIndex = findByIndex(jsObjectArray, searchId);
+    console.log("post index:", postIndex);
+
+    if (postIndex === -1) {
+        return res.status(404).send("Post not found")
+    };
+
+    /*update fields*/
+    console.log("before update:", jsObjectArray[postIndex]);
+    jsObjectArray[postIndex] = {
+        ...jsObjectArray[postIndex],
+        title: userInput.title,
+        body: userInput.body,
+        author: userInput.author
+    };
+
+    console.log("after update:", jsObjectArray[postIndex]);
+    const obJS = JSON.stringify(jsObjectArray);
+
+    await writeToDB(obJS);
+
+    return jsObjectArray[postIndex].id;
+};
 
 /* search by id */
 export const searchByIdModel = async(searchId) => {
@@ -37,7 +65,7 @@ export const searchByTitleModel = async(searchTerm) => {
     };
 };
 
-/*create post */
+/* create new post */
 export const createNewPost = async(data) => {
     const jsObjectArray = await getData();
     const newId = getId();
@@ -59,12 +87,12 @@ export const createNewPost = async(data) => {
     return newPost;
 };
 
-/* Create post form */
+/* Create post form view*/
 export const getNewPostFormModel = async() => {
     return {title: ""};
 };
 
-/*Home page*/
+/* Home page view*/
 export const getHomePageViewModel = async() => {
     const jsObjectArray = await getData();
     const arrayLength = getArrayLength(jsObjectArray);
