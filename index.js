@@ -62,28 +62,16 @@ app.delete("/delete_post/:id", (req, res) => {
 });
 
 /* get delete confirm form */
-app.get("/delete_form/:id", (req, res) => {
-    console.log("Delete request for ID:", req.params.id);
-
-    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
-        if (err) throw (err);
-        const jsObjectArray = JSON.parse(data);
-        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
-        console.log("delete request:", foundPost);
-
-        if (!foundPost) {
-            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
-        };
-
-        const postInfo = {
-            id: foundPost.id,
-            title: foundPost.title,
-            body: foundPost.body,
-            author: foundPost.author
-        };
-
-        res.render("delete_post.ejs", postInfo)  
-    })
+app.get("/delete_form/:id", async(req, res) => {
+    try{
+        console.log("Delete request for ID:", req.params.id);
+        const searchId = req.params.id;
+        const postInfo = await searchByIdModel(searchId);
+        res.render("delete_post.ejs", postInfo);
+    } catch(err) {
+        console.error("Failed to render requested post:", err);
+        res.status(500).send("Could not load post")
+    };
 });
 
 /* Save, and display edited post page. This is what we are working on CoPilot, can you read this btw?*/
@@ -134,30 +122,17 @@ app.patch("/edit/:id", (req, res) => {
 });
 
 /* Get edit post form*/
-app.get("/edit_post/:id", (req, res) => {
-    
-    console.log('Edit request for ID:', req.params.id);
+app.get("/edit_post/:id", async(req, res) => {
+    try{
+        console.log('Edit request for ID:', req.params.id);
+        const searchId = req.params.id;
+        const postInfo = await searchByIdModel(searchId);
+        res.render("edit_post_form.ejs", postInfo)         
+    } catch(err) {
+        console.error("Failed to render requested post:", err);
+        res.status(500).send("Could not load post")
+    };
 
-    fs.readFile("./databases/posts.json", "utf-8", (err, data) => {
-        if (err) throw (err);
-        const jsObjectArray = JSON.parse(data);
-        const foundPost = jsObjectArray.find(post => post.id === req.params.id);
-
-        console.log("Article for editing: ", foundPost);
-
-        if (!foundPost) {
-            return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
-        };
-
-        const postInfo = {
-            id: foundPost.id,
-            title: foundPost.title,
-            body: foundPost.body,
-            author: foundPost.author
-        };    
-        
-        res.render("edit_post_form.ejs", postInfo)
-    })    
 });
 
 /* view article by homepage link, use article unique id */
