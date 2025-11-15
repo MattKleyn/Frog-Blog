@@ -23,3 +23,7 @@ export const findById = (posts, searchId) => {
 export const findByIndex = (posts, searchId) => {
     return posts.findIndex(post => post.id === searchId);
 };
+
+export const removeFromArray = (posts, postIndex) => {
+    return posts.splice(postIndex,1);
+}

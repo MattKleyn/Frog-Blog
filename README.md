@@ -95,7 +95,7 @@ Currently a WIP but will be a great place to journal and share experiences while
 The project is split into 4 distinct phases:
     Phase 1 (complete) - Basic CRUD functionality and styling. 
     Phase 2 (in progress) - Refactoring for better separation of concerns and future scalability, including meta tag search functionality. Accessibility audit using Axe-core.
-    Phase 3 (future) - Create a relational database with either MySQL or PostgreSQL, including migration from JSON. Implementation of user authentication and profiles. 
+    Phase 3 (Commencing) - Create a relational database with either MySQL or PostgreSQL, including migration from JSON. Implementation of user authentication and profiles. 
     Phase 4 (future) - Implementation of machine learning algorithms for better blog article recommendations and tracking. CI/CD automated testing and deployment.
 
 **Contributing**
