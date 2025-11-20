@@ -1,21 +1,36 @@
 import fs from "fs/promises";
 import path from "path";
+import pg from "pg";
+import env from "dotenv";
 
+env.config();
 const postPath = path.join(process.cwd(), 'databases', 'posts.json');
 const archivePath = path.join(process.cwd(), 'databases', 'deleted_posts.json');
 
+const db = new pg.Client({
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
+});
+
+db.connect();
+
 /* read DB */
 export async function getData() {
+    console.log("Accessing DB");
     try {
-        const data = await fs.readFile(postPath, 'utf-8');
-        return JSON.parse(data);
+        const data = await db.query("SELECT * FROM posts;");
+        console.log(data.rows);
+        return data.rows;
     } catch(err) {
         if (err.code === "ENOENT") {
         console.error("File not found:", postPath);
         throw new Error("Posts database file missing.");
         }
         if (err instanceof SyntaxError) {
-        console.error("JSON parse failed:", err);
+        console.error("DB parse failed:", err);
         throw new Error("Posts database is corrupted.");
         }
         console.error("Unexpected read error:", err);
@@ -42,7 +57,6 @@ export async function getArchiveData() {
     };
 };
     
-
 /* write to DB */
 export async function writeToDB(data) {
     const tmpPath = postPath + ".tmp";

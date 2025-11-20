@@ -10,3 +10,9 @@ test.html
 
 #ignores promises and async/await practice file
 practice.js
+
+#excel schema
+schema.xlsx
+
+#ignores .env for database access
+.env
