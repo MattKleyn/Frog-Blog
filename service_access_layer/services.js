@@ -104,23 +104,20 @@ export const searchByTitleModel = async(searchTerm) => {
 /* create new post */
 export const createNewPost = async(data) => {
     const jsObjectArray = await getData();
-    const newId = getId();
 
     const newPost = {
-        id: newId,
         title: data.title,
         body: data.body,
         author: data.author,
+        hero_image: "",
+        created_at: "",
+        featured: false,
     };
 
     console.log("new post:", newPost);
+    const savedPost = await writeToDB(newPost);
 
-    jsObjectArray.push(newPost);
-    const obJS = JSON.stringify(jsObjectArray);
-
-    await writeToDB(obJS);
-
-    return newPost;
+    return savedPost;
 };
 
 /* Create post form view*/

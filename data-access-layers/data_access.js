@@ -59,6 +59,26 @@ export async function getArchiveData() {
     
 /* write to DB */
 export async function writeToDB(data) {
+    try {
+        const query = `INSERT INTO posts (title, body, author, hero_image, created_at, featured) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;`;
+        const values = [
+            data.title,
+            data.body,
+            data.author,
+            data.hero_image || null,
+            data.created_at || null,
+            data.featured
+        ];
+        const result = await db.query(query, values);
+        return result.rows[0];
+    } catch(err) {
+        console.error("Failed to write to file:", err);
+        throw new Error("Failed to write to file");
+    };
+};
+
+/* write to DB 
+export async function writeToDB(data) {
     const tmpPath = postPath + ".tmp";
     try {
         await fs.writeFile(tmpPath, data, 'utf-8');
@@ -67,7 +87,7 @@ export async function writeToDB(data) {
         console.error("Failed to write to file:", err);
         throw new Error("Failed to write to file");
     };
-};
+};*/
 
 /* write to archive DB */
 export async function writeToArchiveDB(data) {
