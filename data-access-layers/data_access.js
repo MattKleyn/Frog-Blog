@@ -22,7 +22,7 @@ export async function getData() {
     console.log("Accessing DB");
     try {
         const data = await db.query("SELECT * FROM posts;");
-        console.log(data.rows);
+        // console.log(data.rows);
         return data.rows;
     } catch(err) {
         if (err.code === "ENOENT") {
@@ -69,6 +69,28 @@ export async function writeToDB(data) {
             data.created_at || null,
             data.featured
         ];
+        const result = await db.query(query, values);
+        return result.rows[0];
+    } catch(err) {
+        console.error("Failed to write to file:", err);
+        throw new Error("Failed to write to file");
+    };
+};
+
+/* update DB entry */
+export async function updateDBEntry(userId, userInput) {
+    try {
+        const query = `UPDATE posts SET title = $2, body = $3, author = $4, hero_image = $5, created_at = $6, featured = $7 WHERE id = $1 RETURNING *;`;
+        const values = [
+            userId,
+            userInput.title,
+            userInput.body,
+            userInput.author,
+            userInput.hero_image || null,
+            userInput.created_at || null,
+            userInput.featured
+        ];
+        console.log("values:", values);
         const result = await db.query(query, values);
         return result.rows[0];
     } catch(err) {

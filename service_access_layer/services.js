@@ -1,4 +1,4 @@
-import { getArchiveData, getData, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
+import { getArchiveData, getData, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
 
 /* delete post and archive model */
@@ -39,30 +39,8 @@ export const deleteAndArchiveModel = async(searchId) => {
 
 /* edit post submit */
 export const editPostModel = async(searchId, userInput) => {
-    const jsObjectArray = await getData();
-
-    const postIndex = findByIndex(jsObjectArray, searchId);
-    console.log("post index:", postIndex);
-
-    if (postIndex === -1) {
-        return res.status(404).send("Post not found")
-    };
-
-    /*update fields*/
-    console.log("before update:", jsObjectArray[postIndex]);
-    jsObjectArray[postIndex] = {
-        ...jsObjectArray[postIndex],
-        title: userInput.title,
-        body: userInput.body,
-        author: userInput.author
-    };
-
-    console.log("after update:", jsObjectArray[postIndex]);
-    const obJS = JSON.stringify(jsObjectArray);
-
-    await writeToDB(obJS);
-
-    return jsObjectArray[postIndex].id;
+    const updatedEntry = await updateDBEntry(searchId, userInput);
+    return updatedEntry.id;
 };
 
 /* search by id */
