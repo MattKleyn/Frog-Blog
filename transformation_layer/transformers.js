@@ -5,6 +5,7 @@ export const getArrayLength = (posts) => {
 
 export const getLatestPost = (posts) => {
     if (!Array.isArray(posts) || posts.length === 0) return null;
+    // console.log("is array:", Array.isArray(posts));
     return posts[posts.length - 1]
 };
 

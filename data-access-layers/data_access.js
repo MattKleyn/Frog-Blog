@@ -56,7 +56,28 @@ export async function getArchiveData() {
         throw new Error("Failed to read posts database.");
     };
 };
-    
+
+/* get single post */
+export async function getPost(searchId) {
+    console.log("Finding Post");
+    try {
+        const data = await db.query("SELECT * FROM posts WHERE id = $1;", [searchId]);
+        console.log("Found Post:", data.rows[0]); 
+        return data.rows[0]; //data.rows returns array of , so must return first object at index 0.
+    } catch(err) {
+        if (err.code === "ENOENT") {
+        console.error("File not found:", postPath);
+        throw new Error("Posts database file missing.");
+        }
+        if (err instanceof SyntaxError) {
+        console.error("DB parse failed:", err);
+        throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    }
+};
+
 /* write to DB */
 export async function writeToDB(data) {
     try {

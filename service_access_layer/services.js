@@ -1,4 +1,4 @@
-import { getArchiveData, getData, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
+import { getArchiveData, getData, getPost, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
 
 /* delete post and archive model */
@@ -45,10 +45,9 @@ export const editPostModel = async(searchId, userInput) => {
 
 /* search by id */
 export const searchByIdModel = async(searchId) => {
-    const jsObjectArray = await getData();
-    const foundPost = findById(jsObjectArray, searchId);
+    const foundPost = await getPost(searchId);
 
-    console.log("User searched for: ", foundPost);
+    console.log("User searched for: ", foundPost.title);
 
     if (!foundPost) {
         return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
