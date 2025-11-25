@@ -1,40 +1,17 @@
-import { getArchiveData, getData, getPost, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
 
 /* delete post and archive model */
 export const deleteAndArchiveModel = async(searchId) => {
-    
-    const jsObjectArray = await getData();
-    const foundPost = findById(jsObjectArray, searchId);
-    const postIndex = findByIndex(jsObjectArray, searchId);
-
-    console.log("deleting object:", foundPost);
-    console.log("deleting at index:", postIndex);
-
-    if (!foundPost) {
-        return res.render("view_post.ejs", {title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
-    };
-
-    if (postIndex === -1) {
-        return res.status(404).send("Post not found")
-    };
-
-    /*setTimeout(10000, deleteAndArive) => deleteAndArchive(if (cancel = false) {delete and write} else {break})*/
         
-    /*console.log("before: ",jsObjectArray);*/
-    removeFromArray(jsObjectArray, postIndex);
-    /*console.log("after: ",jsObjectArray);*/
-    const updatedArray = JSON.stringify(jsObjectArray);
+    const archiveObject = await writeToArchiveDB(searchId);
+    // /*setTimeout(10000, deleteAndArive) => deleteAndArchive(if (cancel = false) {delete and write} else {break})*/
+    await removeFromDB(searchId);
 
-    await writeToDB(updatedArray);
-    
-    const archiveObject = await getArchiveData();
-    archiveObject.push(foundPost);
-    const archive = JSON.stringify(archiveObject);
-
-    await writeToArchiveDB(archive);
-
-    return {title: ""}; 
+    return {
+        id: archiveObject.id,
+        // title: archiveObject.title
+    }; 
 };
 
 /* edit post submit */
