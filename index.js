@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import fs from "fs";
 import methodOverride from "method-override";
-import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel } from "./service_access_layer/services.js";
+import {getHomePageViewModel, getNewPostFormModel, createNewPost, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel } from "./service_access_layer/services.js";
 
 const app = express();
 const port = 3000;
@@ -10,6 +10,19 @@ const port = 3000;
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
+
+/*undo delete route */
+app.delete("/undo_delete/:id", async(req,res) => {
+    try{
+        const searchId = req.params.id;
+        console.log("trying to undo", searchId);
+        const postInfo = await undoDeleteModel(searchId);
+        res.render("view_post.ejs", postInfo)
+    } catch(err){
+        console.error("Failed to undo delete:", err);
+        res.status(500).send("Could not undo delete...oops.")
+    };
+});
 
 /*delete and archive post.*/
 app.delete("/delete_post/:id", async(req, res) => {

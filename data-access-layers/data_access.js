@@ -58,6 +58,25 @@ export async function removeFromDB(searchId) {
     };
 };
 
+export async function removeFromArchive(searchId) {
+    try {
+        const query = `DELETE FROM posts_archive WHERE id=$1;`;
+        const data = await db.query(query, [searchId]);
+        console.log("deleted:", data.rows);
+    } catch(err) {
+        if (err.code === "ENOENT") {
+        console.error("File not found:", db.database);
+        throw new Error("Posts database file missing.");
+        }
+        if (err instanceof SyntaxError) {
+        console.error("JSON parse failed:", err);
+        throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    };
+};
+
 /* get single post */
 export async function getPost(searchId) {
     console.log("Finding Post");
@@ -125,6 +144,18 @@ export async function updateDBEntry(userId, userInput) {
 export async function writeToArchiveDB(searchId) {
     try {
         const query = `INSERT INTO posts_archive SELECT * FROM posts WHERE id=$1 RETURNING *`;
+        const data = await db.query(query, [searchId]);
+        console.log(data.rows[0]);
+        return data.rows[0]
+    } catch(err) {
+        console.error("Failed to write to archive:", err);
+        throw new Error("Failed to write to file");
+    };
+};
+
+export async function copyToDB(searchId) {
+    try {
+        const query = `INSERT INTO posts SELECT * FROM posts_archive WHERE id=$1 RETURNING *`;
         const data = await db.query(query, [searchId]);
         console.log(data.rows[0]);
         return data.rows[0]

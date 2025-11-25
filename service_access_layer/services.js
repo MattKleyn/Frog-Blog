@@ -1,11 +1,22 @@
-import { getData, getPost, removeFromDB, updateDBEntry, writeToArchiveDB, writeToDB } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
+
+/* undo delete */
+export const undoDeleteModel = async(searchId) => {
+    const foundPost = await copyToDB(searchId);
+    await removeFromArchive(searchId);
+
+    return {
+        id: foundPost.id,
+        title: foundPost.title,
+        body: foundPost.body,
+        author: foundPost.author
+    };
+};
 
 /* delete post and archive model */
 export const deleteAndArchiveModel = async(searchId) => {
-        
     const archiveObject = await writeToArchiveDB(searchId);
-    // /*setTimeout(10000, deleteAndArive) => deleteAndArchive(if (cancel = false) {delete and write} else {break})*/
     await removeFromDB(searchId);
 
     return {
