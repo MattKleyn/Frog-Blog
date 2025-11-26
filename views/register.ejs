@@ -1,0 +1,35 @@
+<%- include("partials/header.ejs") %>
+
+    <section>
+        <h1>
+            Welcome to the Dev Frog Blog
+        </h1>
+        <h2>
+            To register, please fill out the form below.
+        </h2>
+        <form name="register_user" action="/register_user" method="POST">
+            <div>
+                <label for="username">
+                    Username
+                </label>
+                <input name="username" type="username">
+            </div>            
+            <div>
+                <label for="email">
+                    Email
+                </label>
+                <input name="email" type="email">
+            </div>
+            <div>
+                <label for="password">
+                    Password
+                </label>
+                <input name="password" type="password">
+            </div>
+            <button name="register" type="submit">
+                Register
+            </button>
+        </form>
+    </section>
+
+<%- include("partials/footer.ejs") %>

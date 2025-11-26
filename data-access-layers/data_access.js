@@ -143,7 +143,7 @@ export async function updateDBEntry(userId, userInput) {
 /* write to archive DB */
 export async function writeToArchiveDB(searchId) {
     try {
-        const query = `INSERT INTO posts_archive SELECT * FROM posts WHERE id=$1 RETURNING *`;
+        const query = `INSERT INTO posts_archive SELECT * FROM posts WHERE id=$1 RETURNING *;`;
         const data = await db.query(query, [searchId]);
         console.log(data.rows[0]);
         return data.rows[0]
@@ -155,12 +155,37 @@ export async function writeToArchiveDB(searchId) {
 
 export async function copyToDB(searchId) {
     try {
-        const query = `INSERT INTO posts SELECT * FROM posts_archive WHERE id=$1 RETURNING *`;
+        const query = `INSERT INTO posts SELECT * FROM posts_archive WHERE id=$1 RETURNING *;`;
         const data = await db.query(query, [searchId]);
         console.log(data.rows[0]);
         return data.rows[0]
     } catch(err) {
         console.error("Failed to write to archive:", err);
         throw new Error("Failed to write to file");
+    };
+};
+
+export async function newUserInfo(userId, username, userEmail, userPassword) {
+    try{
+        const query = `INSERT INTO users VALUES ($1, $2, $3, $4) RETURNING *;`;
+        const userInfo = [userId, username, userEmail, userPassword];
+        const user = await db.query(query, userInfo);
+        return user.rows[0]
+    } catch(err) {
+        console.error("Failed to save new user info to DB:", err);
+        throw new Error("Failed to write new user to file")
+    };
+};
+
+export async function getPassword(userEmail) {
+    try{
+        console.log("email input:", userEmail);
+        const query = `SELECT password FROM users WHERE email=$1;`;
+        const user = await db.query(query, [userEmail]);
+        console.log("user:", user.rows[0]);
+        return user.rows[0]
+    } catch(err) {
+        console.error("Failed to get user password from DB:", err);
+        throw new Error("Failed to retrieve password")
     };
 };

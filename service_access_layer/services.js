@@ -1,8 +1,29 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
 
+/* user login */
+export const authenticateUserModel = async(userEmail) => {
+    const userpassword = await getPassword(userEmail);
+    console.log("serv pword", userpassword.password);
+    return userpassword.password
+};
+
+/* Register new user model */
+export const registerUserModel = async(newUser) => {
+    const username = newUser.username;
+    const userEmail = newUser.email;
+    const userPassword = newUser.password;
+    const userId = Math.floor(Math.random()*100);
+
+    const userInfo = await newUserInfo(userId, username, userEmail, userPassword);
+    return {
+        id: userInfo.id,
+        username: userInfo.username,
+    };
+};
+
 /* undo delete */
-export const undoDeleteModel = async(searchId) => {
+export const undoDeleteModel = async(searchId) => { 
     const foundPost = await copyToDB(searchId);
     await removeFromArchive(searchId);
 
