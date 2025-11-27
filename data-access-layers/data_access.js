@@ -189,3 +189,15 @@ export async function getPassword(userEmail) {
         throw new Error("Failed to retrieve password")
     };
 };
+
+export async function accountExists(userEmail) {
+    try {
+        const query = `SELECT * FROM users WHERE email=$1;`;
+        const isExisting = await db.query(query, [userEmail]);
+        console.log("exists", isExisting.rows);
+        return isExisting.rows
+    } catch(err) {
+        console.error("Failed to retrieve from DB:", err);
+        throw new Error("Failed to retrieve email from DB")
+    };
+};

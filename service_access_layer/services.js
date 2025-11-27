@@ -1,5 +1,6 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray } from "../transformation_layer/transformers.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists } from "../data-access-layers/data_access.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash } from "../transformation_layer/transformers.js";
+
 
 /* user login */
 export const authenticateUserModel = async(userEmail) => {
@@ -8,14 +9,27 @@ export const authenticateUserModel = async(userEmail) => {
     return userpassword.password
 };
 
-/* Register new user model */
+/* Register new user model *///need confirm modal of successful registration
 export const registerUserModel = async(newUser) => {
     const username = newUser.username;
     const userEmail = newUser.email;
     const userPassword = newUser.password;
     const userId = Math.floor(Math.random()*100);
 
-    const userInfo = await newUserInfo(userId, username, userEmail, userPassword);
+    const isRegistered = await accountExists(userEmail);
+    console.log("isreggie:", isRegistered.length);
+    const userInfo = [];
+
+    if (isRegistered.length > 0 ) {
+        
+        console.log("Email already exists, please try logging in.")
+    } else {
+        const hashedPassword = await passwordHash(userPassword);
+        const registeredUserInfo = await newUserInfo(userId, username, userEmail, hashedPassword);
+        userInfo.push(registeredUserInfo)
+    };
+
+    console.log("userifno",userInfo);
     return {
         id: userInfo.id,
         username: userInfo.username,

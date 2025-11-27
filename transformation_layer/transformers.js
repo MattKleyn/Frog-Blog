@@ -1,3 +1,16 @@
+import bcrypt from "bcrypt";
+
+const saltRounds = 10;
+
+export const passwordHash = async(password) => {
+    try{
+        const hash = await bcrypt.hash(password, saltRounds);
+        console.log("local:", hash);
+        return hash
+    } catch(err) {
+        console.log("Error hashing password:", err)
+    }
+};
 
 export const getArrayLength = (posts) => {
     return Array.isArray(posts) ? posts.length : 0
