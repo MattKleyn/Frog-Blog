@@ -2,6 +2,16 @@ import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 
+export const userAuthentication = async(userPassword, storedHashedPassword) => {
+    try{
+        const result = await bcrypt.compare(userPassword, storedHashedPassword);
+        console.log("result:", result);
+        return result
+    } catch(err) {
+        console.log("Error comparing passwords:", err)
+    };
+};
+
 export const passwordHash = async(password) => {
     try{
         const hash = await bcrypt.hash(password, saltRounds);

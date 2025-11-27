@@ -154,16 +154,15 @@ app.get("/register_form", async(req, res) => {
 //still need to validate user for create/ edit/ delete posts
 app.post("/login_user", async(req, res) => {
     try{
-        const userEmail = req.body.email;
-        const userPassword = req.body.password;
+        const userInput = req.body;
 
-        const isPassword = await authenticateUserModel(userEmail);
-
-        if (isPassword == userPassword) {
+        const isAuthenticated = await authenticateUserModel(userInput);
+        console.log("authenticated:", isAuthenticated);
+        if (isAuthenticated) {
             const posts = await getHomePageViewModel();
             res.render("index.ejs", posts)
         } else {
-            res.render("home.ejs", res.status(400).send("please try again"))
+            res.send("Incorrect password, please try again.")
         };
     } catch(err) {
         console.error("Failed to login user:", err);

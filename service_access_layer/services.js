@@ -1,12 +1,22 @@
 import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash } from "../transformation_layer/transformers.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication } from "../transformation_layer/transformers.js";
 
-
+//need a back button on incorret password or something
 /* user login */
-export const authenticateUserModel = async(userEmail) => {
-    const userpassword = await getPassword(userEmail);
-    console.log("serv pword", userpassword.password);
-    return userpassword.password
+export const authenticateUserModel = async(userInput) => {
+    const userEmail = userInput.email;
+    const userPassword = userInput.password;
+
+    const storedUserInfo = await getPassword(userEmail);
+    console.log("storedinfo:", storedUserInfo.password.length);
+    if (storedUserInfo.password.length > 0) {
+        const storedHashedPassword = storedUserInfo.password;
+        console.log("serv pword:", storedUserInfo.password);
+        console.log("userPass:", userPassword);
+        return await userAuthentication(userPassword, storedHashedPassword);
+    } else {
+        console.log("Incorrect Password")
+    };
 };
 
 /* Register new user model *///need confirm modal of successful registration
