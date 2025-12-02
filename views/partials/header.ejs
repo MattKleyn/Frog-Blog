@@ -22,7 +22,11 @@
                         <li><a href="/" class="nav_link">Home</a></li>
                         <li><a href="/new_post_form">create new post</a></li>
                         <li><a href="">Categories</a></li>
+                        <% if (locals.user_id) {%>
+                        <li><a href="/user_profile" role="button">Profile</a></li>
+                        <% } else { %>
                         <li><a href="/login_form" role="button">Login/Register</a></li>
+                        <% } %>
                     </ul>
 
                 </div>

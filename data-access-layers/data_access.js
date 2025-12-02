@@ -180,7 +180,7 @@ export async function newUserInfo(userId, username, userEmail, userPassword) {
 export async function getPassword(userEmail) {
     try{
         console.log("email input:", userEmail);
-        const query = `SELECT password FROM users WHERE email=$1;`;
+        const query = `SELECT * FROM users WHERE email=$1;`;
         const user = await db.query(query, [userEmail]);
         console.log("user:", user.rows[0]);
         return user.rows[0]
@@ -196,6 +196,18 @@ export async function accountExists(userEmail) {
         const isExisting = await db.query(query, [userEmail]);
         console.log("exists", isExisting.rows);
         return isExisting.rows
+    } catch(err) {
+        console.error("Failed to retrieve from DB:", err);
+        throw new Error("Failed to retrieve email from DB")
+    };
+};
+
+export async function getUser(userId) {
+    try {
+        const query = `SELECT * FROM users WHERE user_id=$1;`;
+        const user = await db.query(query, [userId]);
+        console.log("exists", user.rows);
+        return user.rows
     } catch(err) {
         console.error("Failed to retrieve from DB:", err);
         throw new Error("Failed to retrieve email from DB")
