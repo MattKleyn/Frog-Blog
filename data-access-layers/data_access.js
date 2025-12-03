@@ -165,10 +165,22 @@ export async function copyToDB(searchId) {
     };
 };
 
-export async function newUserInfo(userId, username, userEmail, userPassword) {
+export async function newUserInfo(username, userEmail, userPassword) {
     try{
-        const query = `INSERT INTO users VALUES ($1, $2, $3, $4) RETURNING *;`;
-        const userInfo = [userId, username, userEmail, userPassword];
+        const query = `INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *;`;
+        const userInfo = [username, userEmail, userPassword];
+        const user = await db.query(query, userInfo);
+        return user.rows[0]
+    } catch(err) {
+        console.error("Failed to save new user info to DB:", err);
+        throw new Error("Failed to write new user to file")
+    };
+};
+
+export async function newUserProfile(userId, username, userEmail) {
+    try{
+        const query = `INSERT INTO user_profiles (user_id, username, email) VALUES ($1, $2, $3) RETURNING *;`;
+        const userInfo = [userId, username, userEmail];
         const user = await db.query(query, userInfo);
         return user.rows[0]
     } catch(err) {

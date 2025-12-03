@@ -150,7 +150,12 @@ app.post("/register_user", async(req, res) => {
     try{
         const newUser = req.body;
         const userInfo = await registerUserModel(newUser);
-        res.render("home.ejs", userInfo)
+
+        if (!userInfo) {
+            return res.status(400).send("Email already exists, please log in.");
+        }
+
+        res.render("home.ejs", {user: userInfo})
     } catch(err) {
         console.error("Failed to register new user:", err);
         res.status(500).send("Failed to submit user registration, please try again later.")
@@ -172,7 +177,8 @@ app.get("/logout", (req, res) => {
     req.logout(function (err) {
         if (err) {
             return next(err)
-        }
+        };
+        console.log("User logged out.");
         res.redirect("/")
     })
 });

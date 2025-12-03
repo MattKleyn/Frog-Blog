@@ -1,4 +1,4 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication } from "../transformation_layer/transformers.js";
 
 //need a back button on incorret password or something
@@ -21,28 +21,26 @@ export const authenticateUserModel = async(userInput) => {
 
 /* Register new user model *///need confirm modal of successful registration
 export const registerUserModel = async(newUser) => {
-    const username = newUser.username;
-    const userEmail = newUser.email;
-    const userPassword = newUser.password;
-    const userId = Math.floor(Math.random()*100);
-
-    const isRegistered = await accountExists(userEmail);
+    const { username, email, password } = newUser;
+    
+    const isRegistered = await accountExists(email);
     console.log("isreggie:", isRegistered.length);
-    const userInfo = [];
 
     if (isRegistered.length > 0 ) {
-        
-        console.log("Email already exists, please try logging in.")
-    } else {
-        const hashedPassword = await passwordHash(userPassword);
-        const registeredUserInfo = await newUserInfo(userId, username, userEmail, hashedPassword);
-        userInfo.push(registeredUserInfo)
+        console.log("Email already exists, please try logging in.");
+        return null
     };
 
-    console.log("userifno",userInfo);
+    const hashedPassword = await passwordHash(password);
+    const registeredUserInfo = await newUserInfo(username, email, hashedPassword);
+    const userProfile = await newUserProfile(registeredUserInfo.user_id, registeredUserInfo.username, registeredUserInfo.email);
+    console.log("userProfile:", userProfile);
+    console.log("registeredUser:", registeredUserInfo);
+
     return {
-        id: userInfo.id,
-        username: userInfo.username,
+        id: registeredUserInfo.id,
+        username: registeredUserInfo.username,
+        email: registeredUserInfo.email,
     };
 };
 
