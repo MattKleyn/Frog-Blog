@@ -1,15 +1,20 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById } from "../data-access-layers/data_access.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile } from "../transformation_layer/transformers.js";
+
+export async function updateUserProfileModel(userId, userInfo) {
+  return await updateUserProfileById(userId, userInfo);
+};
 
 export const getUserProfileModel = async(userId) => {
   const profile = await getUserProfileById(userId);
   if (!profile) {
     throw new Error("Profile not found");
-  }
+  };
 
   const transformedProfile = await transformUserProfile(profile);
+  console.log("updated profile:", transformUserProfile);
   return transformedProfile;
-}
+};
 
 //need a back button on incorret password or something
 /* user login */

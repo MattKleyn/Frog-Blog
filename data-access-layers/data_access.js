@@ -239,4 +239,24 @@ export async function getUserProfileById(userId) {
     console.error("Failed to fetch user profile:", err);
     throw new Error("Database error fetching user profile");
   }
-}
+};
+
+export async function updateUserProfileById(userId, userInfo) {
+  const query = `
+    UPDATE user_profiles
+    SET username = $1, email = $2, status = $3, name = $4, surname = $5, tech_stack = $6, user_bio = $7
+    WHERE user_id = $8
+    RETURNING *;
+  `;
+  const values = [
+    userInfo.username, 
+    userInfo.email, 
+    userInfo.status, 
+    userInfo.name, 
+    userInfo.surname, 
+    userInfo.tech_stack, 
+    userInfo.user_bio, 
+    userId];
+  const result = await db.query(query, values);
+  return result.rows[0];
+};

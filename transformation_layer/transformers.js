@@ -9,8 +9,9 @@ export const transformUserProfile = async(profileRow) => {
     email: profileRow.email,
     name: profileRow.name || "",
     surname: profileRow.surname || "",
-    bio: profileRow.user_bio || "",
-    techStack: profileRow.tech_stack || "",
+    status: profileRow.status || "",
+    user_bio: profileRow.user_bio || "",
+    tech_stack: profileRow.tech_stack || "",
   };
 }
 

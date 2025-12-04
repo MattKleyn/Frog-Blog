@@ -6,7 +6,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import bcrypt from "bcrypt";
-import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost} from "./service_access_layer/services.js";
+import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost, updateUserProfileModel} from "./service_access_layer/services.js";
 import { accountExists, getUser } from "./data-access-layers/data_access.js";
 import { attachUserToLocals, ensureAuthenticated } from "./middleware-layers/validatePost.js";
 
@@ -193,6 +193,42 @@ app.get("/logout", (req, res) => {
         console.log("User logged out.");
         res.redirect("/")
     })
+});
+
+/* Update user profile, protected with ensureAuthentication middleware */
+app.patch("/update_profile/:id", ensureAuthenticated, async(req, res) => {
+      try {
+    const requestedId = req.params.id;
+
+    if (req.user.user_id !== requestedId) {
+      return res.status(403).send("Forbidden");
+    }
+
+    await updateUserProfileModel(requestedId, req.body);
+    res.redirect(`/user_profile/${requestedId}`);
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).send("Could not update profile.");
+  }
+});
+
+/* Get form to Edit user profile, protected with ensureAuthenticaation middleware */
+app.get("/edit_profile/:id", ensureAuthenticated, async(req, res) => {
+    try {
+        const requestedId = req.params.id;
+        console.log("userId:", requestedId);
+
+        // Only allow editing your own profile
+        if (req.user.user_id !== requestedId) {
+        return res.status(403).send("Forbidden");
+        };
+
+        const userProfile = await getUserProfileModel(requestedId);
+        res.render("edit_profile_form.ejs", {user: userProfile})
+    } catch (err) {
+        console.error("Failed to render requested profile:", err);
+        res.status(500).send("Could not load profile")
+    }
 });
 
 /* view user profile, protected with ensureAuthentication middleware */
