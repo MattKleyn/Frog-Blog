@@ -9,7 +9,11 @@
                     <li>Socials</li>
                 </ul>
             </div>
-            <a href="/new_post_form" class="button_style">create new post</a>
+            <% if (user) { %> 
+                <a href="/new_post_form" class="button_style">create new post</a>
+            <% } else { %>
+                <a href="/login_form" role="button">Login/Register to Create Posts</a>
+            <% } %>
             <p>copyright&copy;2025</p>
         </footer>    
     </body>

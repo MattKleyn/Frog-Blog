@@ -206,7 +206,7 @@ export async function accountExists(userEmail) {
     try {
         const query = `SELECT * FROM users WHERE email=$1;`;
         const isExisting = await db.query(query, [userEmail]);
-        console.log("exists", isExisting.rows);
+        console.log("User exists:", isExisting.rows);
         return isExisting.rows
     } catch(err) {
         console.error("Failed to retrieve from DB:", err);
@@ -218,10 +218,25 @@ export async function getUser(userId) {
     try {
         const query = `SELECT * FROM users WHERE user_id=$1;`;
         const user = await db.query(query, [userId]);
-        console.log("exists", user.rows);
+        console.log("fetching user profile:", user.rows);
         return user.rows
     } catch(err) {
         console.error("Failed to retrieve from DB:", err);
         throw new Error("Failed to retrieve email from DB")
     };
 };
+
+export async function getUserProfileById(userId) {
+  try {
+    const query = `
+      SELECT user_id, username, email, name, surname, profile_pic, user_bio, status, tech_stack
+      FROM user_profiles
+      WHERE user_id = $1;
+    `;
+    const result = await db.query(query, [userId]);
+    return result.rows[0];
+  } catch (err) {
+    console.error("Failed to fetch user profile:", err);
+    throw new Error("Database error fetching user profile");
+  }
+}

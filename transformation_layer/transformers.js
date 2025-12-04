@@ -2,6 +2,18 @@ import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 
+export const transformUserProfile = async(profileRow) => {
+  return {
+    id: profileRow.user_id,
+    username: profileRow.username,
+    email: profileRow.email,
+    name: profileRow.name || "",
+    surname: profileRow.surname || "",
+    bio: profileRow.user_bio || "",
+    techStack: profileRow.tech_stack || "",
+  };
+}
+
 export const userAuthentication = async(userPassword, storedHashedPassword) => {
     try{
         const result = await bcrypt.compare(userPassword, storedHashedPassword);

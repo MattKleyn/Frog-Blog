@@ -1,5 +1,15 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication } from "../transformation_layer/transformers.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById } from "../data-access-layers/data_access.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile } from "../transformation_layer/transformers.js";
+
+export const getUserProfileModel = async(userId) => {
+  const profile = await getUserProfileById(userId);
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
+
+  const transformedProfile = await transformUserProfile(profile);
+  return transformedProfile;
+}
 
 //need a back button on incorret password or something
 /* user login */
@@ -111,8 +121,6 @@ export const searchByTitleModel = async(searchTerm) => {
 
 /* create new post */
 export const createNewPost = async(data) => {
-    const jsObjectArray = await getData();
-
     const newPost = {
         title: data.title,
         body: data.body,
@@ -126,11 +134,6 @@ export const createNewPost = async(data) => {
     const savedPost = await writeToDB(newPost);
 
     return savedPost;
-};
-
-/* Create post form view*/
-export const getNewPostFormModel = async() => {
-    return {title: ""};
 };
 
 /* Home page view*/
