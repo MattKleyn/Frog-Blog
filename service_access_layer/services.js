@@ -1,5 +1,6 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById } from "../data-access-layers/data_access.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile } from "../transformation_layer/transformers.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories } from "../data-access-layers/data_access.js";
+import { validatePostInput } from "../middleware-layers/validatePost.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel } from "../transformation_layer/transformers.js";
 
 export async function updateUserProfileModel(userId, userInfo) {
   return await updateUserProfileById(userId, userInfo);
@@ -125,20 +126,30 @@ export const searchByTitleModel = async(searchTerm) => {
 };
 
 /* create new post */
-export const createNewPost = async(data) => {
-    const newPost = {
-        title: data.title,
-        body: data.body,
-        author: data.author,
-        hero_image: "",
-        created_at: "",
-        featured: false,
+export const createNewPost = async(formData, user) => {
+    console.log("checked categories:", formData.category );
+    const categories = await getCategories();
+
+    const { errors, normalized } = await validatePostInput(formData, categories);
+    if (errors.length) {
+        return { errors, form: normalized, categories }
     };
+    
+    const postInput = toPostInsertModel(normalized, user);
+   
+    const savedPost = await writeToDB(postInput);
+    console.log("savedPost:",savedPost);
 
-    console.log("new post:", newPost);
-    const savedPost = await writeToDB(newPost);
+    if (normalized.categories.length){
+        await insertPostCategories(savedPost.id, normalized.categories);
+    }
+    return { post: savedPost};
+};
 
-    return savedPost;
+/*model to display list of categories for new post */
+export const newPostFormModel = async() =>  {
+    const categories = await getCategories();
+    return categories
 };
 
 /* Home page view*/

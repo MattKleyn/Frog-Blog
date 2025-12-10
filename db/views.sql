@@ -12,6 +12,19 @@ CREATE TABLE posts
     CONSTRAINT posts_title_key UNIQUE (title)
 )
 
+/*Junction table for posts and categories*/
+CREATE TABLE post_categories (
+post_id uuid REFERENCES posts(id) ON DELETE CASCADE,
+category_id uuid REFERENCES categories(category_id) ON DELETE CASCADE,
+PRIMARY KEY (post_id, category_id)
+);
+
+/* categories master table*/
+CREATE TABLE categories (
+    category_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_name varchar(255) UNIQUE NOT NULL
+);
+
 /* Table of archived posts*/
 CREATE TABLE posts_archive
 (
@@ -40,7 +53,7 @@ CREATE TABLE user_profiles
     CONSTRAINT user_profiles_pkey PRIMARY KEY (user_id),
     CONSTRAINT user_profiles_username_key UNIQUE (username),
     CONSTRAINT fk_user_profiles_user FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id) MATCH SIMPLE
+        REFERENCES users (user_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 )

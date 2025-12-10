@@ -2,6 +2,18 @@ import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 
+export function toPostInsertModel(validated, user) {
+  const fullName = `${user.username}`;
+  return {
+    title: validated.title,
+    body: validated.body,
+    author: fullName,
+    hero_image: "",
+    featured: false,
+    user_id: user.user_id,
+  };
+};
+
 export const transformUserProfile = async(profileRow) => {
   return {
     id: profileRow.user_id,

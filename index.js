@@ -6,7 +6,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import bcrypt from "bcrypt";
-import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost, updateUserProfileModel} from "./service_access_layer/services.js";
+import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost, updateUserProfileModel, newPostFormModel} from "./service_access_layer/services.js";
 import { accountExists, getUser } from "./data-access-layers/data_access.js";
 import { attachUserToLocals, ensureAuthenticated } from "./middleware-layers/validatePost.js";
 
@@ -138,8 +138,22 @@ app.post("/view", async(req, res) => {
 app.post("/create_post", ensureAuthenticated, async(req, res) => {
     try{
         const userInput = req.body;
-        const newPost = await createNewPost(userInput);
-        res.render("view_post.ejs", newPost); 
+        const user = req.user;
+        console.log("new post details:", userInput);
+        console.log("req.user:", user);
+
+        const newPost = await createNewPost(userInput, user);
+        console.log("new post:", newPost);
+
+        if (newPost.errors) {
+            return res.status(400).render("new_post_form.ejs", {
+                categories: newPost.categories,
+                errors: newPost.errors,
+                form: newPost.form,
+            });
+        };
+
+        res.redirect(`/posts/${newPost.post.id}`); 
     } catch(err) {
         console.error("Failed to render new post:", err);
         res.status(500).send("Could not load new post")
@@ -150,7 +164,13 @@ app.post("/create_post", ensureAuthenticated, async(req, res) => {
 app.get("/new_post_form", ensureAuthenticated, async(req, res) => {
     try {
         console.log("Display create post form");
-        res.render("new_post_form.ejs");   
+        const categories = await newPostFormModel();
+        res.render("new_post_form.ejs", {
+            categories, 
+            errors: [], 
+            form: {},
+            user: req.user
+        });   
     } catch (err) {
         console.error("Failed to render new post form:", err);
         res.status(500).send("Could not load new post form")

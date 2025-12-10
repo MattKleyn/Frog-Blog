@@ -9,8 +9,14 @@
                 <textarea type="text" name="body" class="input_text-body" required></textarea> <!--Consider a way to upload a file for UX, also how to represent different sections, headings, images etc?-->
             </label>
             <label id="author">Author name: 
-                <input type="text" name="author" class="input_field" required>
+                <input type="text" name="author" class="input_field" value="<%= user ? user.username : '' %>" required>
             </label>
+            <% categories.forEach(category => { %>
+                <label>
+                    <input type="checkbox" name="category" value="<%= category.category_id %>">
+                    <%= category.category_name %>
+                </label>
+            <% }) %>
             <div>
                 <button type="submit" name="submit_new_article" value="new" class="button_style">Submit new article</button> <!--getting button name and value on submission too-->
                 <a href="/" class="button_style-ghost">Cancel</a>

@@ -98,6 +98,35 @@ export async function getPost(searchId) {
     }
 };
 
+/* get categories */
+export async function getCategories() {
+    try{
+        const data = await db.query(`SELECT * FROM categories ORDER BY category_name;`);
+        //console.log("categories[0]:", data.rows[0]);
+        return data.rows;
+    } catch(err) {
+        if (err.code === "ENOENT") {
+        console.error("File not found:", db.database);
+        throw new Error("Categories database file missing.");
+        }
+        if (err instanceof SyntaxError) {
+        console.error("DB parse failed:", err);
+        throw new Error("Categories database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read Categories database.");
+    }
+};
+
+export async function getCategoriesByIds(ids) {
+  if (!ids.length) return [];
+  const { rows } = await db.query(
+    `SELECT category_id FROM categories WHERE category_id = ANY($1::uuid[])`,
+    [ids]
+  );
+  return rows;
+}
+
 /* write to DB */
 export async function writeToDB(data) {
     try {
@@ -116,6 +145,16 @@ export async function writeToDB(data) {
         console.error("Failed to write to file:", err);
         throw new Error("Failed to write to file");
     };
+};
+
+export async function insertPostCategories(postId, categoryIds) {
+    for (const catId of categoryIds) {
+        await db.query(
+            `INSERT INTO post_categories (post_id, category_id) VALUES ($1, $2)
+            ON CONFLICT (post_id, category_id) DO NOTHING;`,
+            [postId, catId]
+        );
+    }
 };
 
 /* update DB entry */
