@@ -307,6 +307,7 @@ app.get("/", async (req, res) => {
     };
 });
 
+/* Email and password login Strategy */
 passport.use(
     new Strategy(
         { usernameField: "email" },

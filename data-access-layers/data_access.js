@@ -38,6 +38,25 @@ export async function getData() {
     }
 };
 
+/* return post with categories */
+export async function getPostWithCategories() {
+    try {
+        const data = await db.query("SELECT * FROM posts_with_categories;")
+        return data.rows;
+    } catch (err) {
+        if (err.code === "ENOENT") {
+            console.error("File not found:", db.database);
+            throw new Error("Posts database file missing.")
+        }
+        if (err instanceof SyntaxError) {
+            console.error("DB parse failed:", err);
+            throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    }
+};
+
 /* read archive DB */
 export async function removeFromDB(searchId) {
     try {

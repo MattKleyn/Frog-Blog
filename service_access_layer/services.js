@@ -1,6 +1,6 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories } from "../data-access-layers/data_access.js";
 import { validatePostInput } from "../middleware-layers/validatePost.js";
-import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel } from "../transformation_layer/transformers.js";
+import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel, normalizePostsWithCategories, truncateBodyText } from "../transformation_layer/transformers.js";
 
 export async function updateUserProfileModel(userId, userInfo) {
   return await updateUserProfileById(userId, userInfo);
@@ -154,16 +154,23 @@ export const newPostFormModel = async() =>  {
 
 /* Home page view*/
 export const getHomePageViewModel = async() => {
-    const jsObjectArray = await getData();
-    const arrayLength = getArrayLength(jsObjectArray);
-    const latestPost = getLatestPost(jsObjectArray) ?? {title: "", body: "", author: ""};
+    const rows = await getPostWithCategories();
+    const posts = await normalizePostsWithCategories(rows);
+    const arrayLength = getArrayLength(posts);
+    const latestPost = getLatestPost(posts) ?? {title: "", body: "", author: "", categories: []};
+
+    const recentPosts = posts.map( p => ({
+        ...p, 
+        body: truncateBodyText(p.body)
+    }));
 
     return {
         title: latestPost.title,
         body: latestPost.body,
         author: latestPost.author,
+        categories: latestPost.categories,
         quantity: arrayLength,
-        recentPosts: jsObjectArray
+        recentPosts
     };
 };
 

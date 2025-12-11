@@ -78,9 +78,9 @@ ALTER COLUMN user_id TYPE UUID USING gen_random_uuid();
 ALTER TABLE posts
 ALTER COLUMN id SET DEFAULT gen_random_uuid();
 
-/* example of view, not yet done*/
-CREATE VIEW vw_users_with_profiles AS
-SELECT u.user_id, u.username, u.email, p.name, p.surname, p.profile_pic, p.user_bio, p.status, p.tech_stack
-FROM users u
-LEFT JOIN user_profiles p
-WHERE u.user_id = p.user_id;
+/* View for posts to post_categories to categories */
+CREATE VIEW posts_with_categories AS
+SELECT p.id, p.title, p.body, p.author, c.category_id, c.category_name
+FROM posts p
+LEFT JOIN post_categories pc ON p.id = pc.post_id
+LEFT JOIN categories c ON pc.category_id = c.category_id;

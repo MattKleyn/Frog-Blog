@@ -2,7 +2,41 @@ import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 
-export function toPostInsertModel(validated, user) {
+export function truncateBodyText(body, wordLimit = 20) {
+  if (!body) return "";
+  const words = body.split(/\s+/);
+  return words.length > wordLimit
+    ? words.slice(0, wordLimit).join(" ") + "..."
+    : body;
+};
+
+/*normalize post with categories on GET */
+export const normalizePostsWithCategories = (rows) => {
+    const postsMap = new Map();
+
+    rows.forEach(row => {
+        if(!postsMap.has(row.id)) {
+            postsMap.set(row.id, {
+                id: row.id,
+                title: row.title,
+                body: row.body,
+                author: row.author,
+                categories: []
+            });
+        }
+        if(row.category_id) {
+            postsMap.get(row.id).categories.push({
+                category_id: row.category_id,
+                category_name: row.category_name
+            });
+        }
+    });
+
+    return Array.from(postsMap.values());
+};
+
+/* normalize post on creation */
+export const toPostInsertModel = (validated, user) => {
   const fullName = `${user.username}`;
   return {
     title: validated.title,
@@ -14,6 +48,7 @@ export function toPostInsertModel(validated, user) {
   };
 };
 
+/* normalize user profile */
 export const transformUserProfile = async(profileRow) => {
   return {
     id: profileRow.user_id,

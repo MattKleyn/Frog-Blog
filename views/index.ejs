@@ -7,13 +7,18 @@
     </section>
 
     <div class="main_styles">
-        <% if (locals.title) { %>
+        <% if (title) { %>
         <section class="headline_article">
             <div class="hero">
                 <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="hero_image">
                 <h1 class="hero_title">
                     <%= title %>
                 </h1>
+                <% if (categories && categories.length) { %>
+                    <% categories.forEach((category) => { %>
+                        <p class="pill"><%= category.category_name %></p>
+                    <% }) %>
+                <% } %>
                 <h3 class="hero_author">
                     <%=author%>
                 </h3>
@@ -37,7 +42,12 @@
                     <a href="/posts/<%=posts.id%>">
                         <img src="" alt="">
                         <h3><%= posts.title %></h3>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Culpa incidunt ad nemo, cupiditate velit itaque laborum modi corrupti placeat non iste illum quidem, illo exercitationem odio nam veniam id harum.</p>
+                        <% if (posts.categories && posts.categories.length) { %> 
+                            <% posts.categories.forEach((category) => { %>
+                            <p class="pill"><%=category.category_name %></p>
+                            <% }) %>
+                        <% } %>
+                        <p><%= posts.body %></p>
                         <h4><%=posts.author%></h4>
                     </a>
                 </li>
