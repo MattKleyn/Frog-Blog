@@ -1,4 +1,4 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories, getPostByNameWithCategories, getPostByIdWithCategories } from "../data-access-layers/data_access.js";
 import { validatePostInput } from "../middleware-layers/validatePost.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel, normalizePostsWithCategories, truncateBodyText } from "../transformation_layer/transformers.js";
 
@@ -92,36 +92,42 @@ export const editPostModel = async(searchId, userInput) => {
 
 /* search by id */
 export const searchByIdModel = async(searchId) => {
-    const foundPost = await getPost(searchId);
-
+    const rows = await getPostByIdWithCategories(searchId);
+    const post = normalizePostsWithCategories(rows);
+    const foundPost = post[0];
     console.log("User searched for: ", foundPost.title);
 
     if (!foundPost) {
-        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that id.", author: "Please try again"})
+        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that id.", author: "Please try again", categories: []})
     };
 
     return {
         id: foundPost.id,
         title: foundPost.title,
         body: foundPost.body,
-        author: foundPost.author
+        author: foundPost.author,
+        categories: foundPost.categories
     };
 };
 
 /* search by title */
 export const searchByTitleModel = async(searchTerm) => {
-    const jsObjectArray = await getData();
-    const foundPost = findByTitle(jsObjectArray, searchTerm);
+    const rows = await getPostByNameWithCategories(searchTerm);
+
+    const post = normalizePostsWithCategories(rows);
+    const foundPost = post[0];
+    console.log("foundPost:", foundPost);
 
     if (!foundPost) {
-        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that title.", author: "Try searching something else"})
+        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that title.", author: "Try searching something else", categories: []})
     };
 
     return {
         id: foundPost.id,
         title: foundPost.title,
         body: foundPost.body,
-        author: foundPost.author
+        author: foundPost.author,
+        categories: foundPost.categories
     };
 };
 

@@ -115,19 +115,24 @@ app.get("/posts/:id", async(req, res) => {
         console.log("User searched for id:", req.params.id);      
         const searchId = req.params.id;
         const postInfo = await searchByIdModel(searchId);
-        res.render("view_post.ejs", postInfo);
+        res.render("view_post.ejs", {...postInfo, errors: [], user: req.user});
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")
     };
 });
 
-/* Search bar, article by title, using Post req instead of get request, doesnt give valid form data, returns undefined*/
+/* Search bar, article by title */
 app.post("/view", async(req, res) => {
     try{
         const searchTerm = req.body.search.toLowerCase();
         const postInfo = await searchByTitleModel(searchTerm);
-        res.render("view_post.ejs", postInfo)
+
+        res.render("view_post.ejs", {
+            ...postInfo,
+            errors: [], 
+            user: req.user
+        })
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")
@@ -300,7 +305,7 @@ app.get("/", async (req, res) => {
     try{
         console.log("Display homepage");
         const posts = await getHomePageViewModel();
-        res.render("index.ejs", posts);
+        res.render("index.ejs", {...posts, errors: [], user: req.user});
     } catch(err) {
         console.error("Failed to load posts:", err);
         res.status(500).send("Could not load posts")

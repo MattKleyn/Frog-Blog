@@ -38,7 +38,7 @@ export async function getData() {
     }
 };
 
-/* return post with categories */
+/* return all post incl categories */
 export async function getPostWithCategories() {
     try {
         const data = await db.query("SELECT * FROM posts_with_categories;")
@@ -96,7 +96,51 @@ export async function removeFromArchive(searchId) {
     };
 };
 
-/* get single post */
+/* return post with categories by post title */
+export async function getPostByNameWithCategories(searchTerm) {
+    try {
+        const query = `SELECT * FROM posts_with_categories WHERE title = $1;`;
+        const value = searchTerm;
+        const data = await db.query(query, [value]);
+        console.log("viewing:", data.rows);
+        return data.rows;
+    } catch (err) {
+        if (err.code === "ENOENT") {
+            console.error("File not found:", db.database);
+            throw new Error("Posts database file missing.")
+        }
+        if (err instanceof SyntaxError) {
+            console.error("DB parse failed:", err);
+            throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    }
+};
+
+/* return post with categories by post id */
+export async function getPostByIdWithCategories(searchId) {
+    try {
+        const query = `SELECT * FROM posts_with_categories WHERE id = $1;`;
+        const value = searchId;
+        const data = await db.query(query, [value]);
+        console.log("viewing:", data.rows);
+        return data.rows;
+    } catch (err) {
+        if (err.code === "ENOENT") {
+            console.error("File not found:", db.database);
+            throw new Error("Posts database file missing.")
+        }
+        if (err instanceof SyntaxError) {
+            console.error("DB parse failed:", err);
+            throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    }
+};
+
+/* return post by Id */
 export async function getPost(searchId) {
     console.log("Finding Post");
     try {

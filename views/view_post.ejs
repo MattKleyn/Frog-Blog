@@ -1,12 +1,17 @@
 <%- include("partials/header.ejs") %>
  
     <section class="article">
-    <% if (locals.title) { %> 
+    <% if (title) { %> 
         <div class="article_head">
             <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="article_image">
             <h1 class="title">
                 <%= title %>
             </h1>
+            <% if (categories && categories.length) { %>
+                <% categories.forEach((category) => { %>
+                <p class="pill"><%= category.category_name %></p>
+                <% }) %>
+            <% } %>
             <h3 class="author">
                 <%=author%>
             </h3>
