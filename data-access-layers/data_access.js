@@ -223,7 +223,10 @@ export async function insertPostCategories(postId, categoryIds) {
 /* update DB entry */
 export async function updateDBEntry(userId, userInput) {
     try {
-        const query = `UPDATE posts SET title = $2, body = $3, author = $4, hero_image = $5, created_at = $6, featured = $7 WHERE id = $1 RETURNING *;`;
+        const query = `
+        UPDATE posts 
+        SET title = $2, body = $3, author = $4, hero_image = $5, created_at = $6, featured = $7 
+        WHERE id = $1 RETURNING *;`;
         const values = [
             userId,
             userInput.title,
@@ -231,7 +234,7 @@ export async function updateDBEntry(userId, userInput) {
             userInput.author,
             userInput.hero_image || null,
             userInput.created_at || null,
-            userInput.featured
+            userInput.featured || false
         ];
         console.log("values:", values);
         const result = await db.query(query, values);
@@ -241,6 +244,24 @@ export async function updateDBEntry(userId, userInput) {
         throw new Error("Failed to write to file");
     };
 };
+
+export async function updatePostCategories(postId, categoryIds) {
+  try {
+    await db.query("DELETE FROM post_categories WHERE post_id = $1;", [postId]);
+
+    if (categoryIds.length > 0) {
+        for (const categoryId of categoryIds) {
+            await db.query(
+            "INSERT INTO post_categories (post_id, category_id) VALUES ($1, $2);",
+            [postId, categoryId]
+            );
+        }
+    }
+  } catch (err) {
+    console.error("Failed to update post categories:", err);
+    throw new Error("Failed to update post categories");
+  }
+}
 
 /* write to archive DB */
 export async function writeToArchiveDB(searchId) {

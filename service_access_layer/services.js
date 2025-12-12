@@ -1,4 +1,4 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories, getPostByNameWithCategories, getPostByIdWithCategories } from "../data-access-layers/data_access.js";
+import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories, getPostByNameWithCategories, getPostByIdWithCategories, updatePostCategories } from "../data-access-layers/data_access.js";
 import { validatePostInput } from "../middleware-layers/validatePost.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel, normalizePostsWithCategories, truncateBodyText } from "../transformation_layer/transformers.js";
 
@@ -87,6 +87,16 @@ export const deleteAndArchiveModel = async(searchId) => {
 /* edit post submit */
 export const editPostModel = async(searchId, userInput) => {
     const updatedEntry = await updateDBEntry(searchId, userInput);
+
+    let categoryIds = [];
+    if (userInput.category) {
+        categoryIds = Array.isArray(userInput.category)
+        ? userInput.category
+        : [userInput.category];
+
+    await updatePostCategories(searchId, categoryIds);
+    }
+
     return updatedEntry.id;
 };
 

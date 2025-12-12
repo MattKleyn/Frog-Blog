@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost, updateUserProfileModel, newPostFormModel} from "./service_access_layer/services.js";
 import { accountExists, getUser } from "./data-access-layers/data_access.js";
 import { attachUserToLocals, ensureAuthenticated } from "./middleware-layers/validatePost.js";
+import { getCategories } from "./data-access-layers/data_access.js";
 
 const app = express();
 const port = 3000;
@@ -87,8 +88,8 @@ app.patch("/edit/:id", ensureAuthenticated, async(req, res) => {
         const searchId = req.params.id;
         const userInput = req.body;
         console.log('Editing post with ID:', searchId);
-        const postInfo = await editPostModel(searchId, userInput);
-        res.redirect(`/posts/${postInfo}`);
+        const postId= await editPostModel(searchId, userInput);
+        res.redirect(`/posts/${postId}`);
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")
@@ -101,7 +102,10 @@ app.get("/edit_post/:id", ensureAuthenticated, async(req, res) => {
         console.log('Edit request for ID:', req.params.id);
         const searchId = req.params.id;
         const postInfo = await searchByIdModel(searchId);
-        res.render("edit_post_form.ejs", postInfo)         
+
+        const allCategories = await getCategories();
+
+        res.render("edit_post_form.ejs", {allCategories, ...postInfo, selectedCategories: postInfo.categories, errors: [], user: req.user})         
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")

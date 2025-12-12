@@ -11,6 +11,15 @@
             <label id="author">Author name: 
                 <input type="text" name="author" value="<%= author %>" class="input_field" required>
             </label>
+            <% allCategories.forEach(category => { %>
+                <label>
+                    <input type="checkbox" name="category" value="<%= category.category_id %>"
+                    <% if (selectedCategories.some(c => c.category_id == category.category_id)) { %> 
+                        checked
+                    <% } %> >
+                    <%= category.category_name %>
+                </label>
+            <% }) %>
             <div>
                 <button type="submit" name="save_changes" value="edited" class="button_style">Save Changes</button>
                 <a href="/posts/<%=id%>" class="button_style-ghost" role="button">Cancel</a>
