@@ -50,7 +50,7 @@ app.delete("/undo_delete/:id", ensureAuthenticated, async(req,res) => {
         const searchId = req.params.id;
         console.log("trying to undo", searchId);
         const postInfo = await undoDeleteModel(searchId);
-        res.render("view_post.ejs", postInfo)
+        res.render("view_post.ejs", {...postInfo, errors: [], user: req.user})
     } catch(err){
         console.error("Failed to undo delete:", err);
         res.status(500).send("Could not undo delete...oops.")
@@ -62,7 +62,7 @@ app.delete("/delete_post/:id", ensureAuthenticated, async(req, res) => {
     try{
         const searchId = req.params.id;
         const postInfo = await deleteAndArchiveModel(searchId);
-        res.render("delete_post.ejs", postInfo) 
+        res.render("delete_post.ejs", {...postInfo, errors: [], user: req.user}) 
     } catch(err) {
         console.error("Failed to render delete confirmation:", err);
         res.status(500).send("Could not load delete confirmation")
@@ -75,7 +75,7 @@ app.get("/delete_form/:id", ensureAuthenticated, async(req, res) => {
         console.log("Delete request for ID:", req.params.id);
         const searchId = req.params.id;
         const postInfo = await searchByIdModel(searchId);
-        res.render("delete_post.ejs", postInfo);
+        res.render("delete_post.ejs", {...postInfo, errors: [], user: req.user});
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")

@@ -38,6 +38,13 @@ CREATE TABLE posts_archive
     CONSTRAINT posts_archive_pkey PRIMARY KEY (id)
 )
 
+/* table of archived posts categories */
+CREATE TABLE post_categories_archive (
+post_id UUID,
+category_id UUID,
+PRIMARY KEY (post_id, category_id)
+);
+
 /* Table of user profiles, displays all user info*/
 CREATE TABLE user_profiles
 (

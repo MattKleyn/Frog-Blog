@@ -1,4 +1,4 @@
-import { getData, getPost, removeFromDB, removeFromArchive, updateDBEntry, writeToArchiveDB, writeToDB, copyToDB, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories, getPostByNameWithCategories, getPostByIdWithCategories, updatePostCategories } from "../data-access-layers/data_access.js";
+import { getData, getPost, removePostFromDB, removeCategoriesFromDB, removeCategoriesFromArchive, removePostFromArchive, updateDBEntry, writePostToArchive, writeCategoriesToArchive, writeToDB, copyPostFromArchive, copyCategoriesFromArchive, newUserInfo, getPassword, accountExists, newUserProfile, getUserProfileById, updateUserProfileById, getCategories, insertPostCategories, getCategoriesByIds, getPostWithCategories, getPostByNameWithCategories, getPostByIdWithCategories, updatePostCategories } from "../data-access-layers/data_access.js";
 import { validatePostInput } from "../middleware-layers/validatePost.js";
 import { getArrayLength, getLatestPost, getId, findByTitle, findById, findByIndex, removeFromArray, passwordHash, userAuthentication, transformUserProfile, toPostInsertModel, normalizePostsWithCategories, truncateBodyText } from "../transformation_layer/transformers.js";
 
@@ -62,26 +62,30 @@ export const registerUserModel = async(newUser) => {
 
 /* undo delete */
 export const undoDeleteModel = async(searchId) => { 
-    const foundPost = await copyToDB(searchId);
-    await removeFromArchive(searchId);
+  const restoredPost = await copyPostFromArchive(searchId);
+  const restoredCategories = await copyCategoriesFromArchive(searchId);
 
-    return {
-        id: foundPost.id,
-        title: foundPost.title,
-        body: foundPost.body,
-        author: foundPost.author
-    };
+  await removePostFromArchive(searchId);
+  await removeCategoriesFromArchive(searchId);
+
+  return {
+    id: restoredPost.id,
+    title: restoredPost.title,
+    body: restoredPost.body,
+    author: restoredPost.author,
+    categories: restoredCategories.categories || []
+  };
 };
 
 /* delete post and archive model */
 export const deleteAndArchiveModel = async(searchId) => {
-    const archiveObject = await writeToArchiveDB(searchId);
-    await removeFromDB(searchId);
+  const archiveObject = await writePostToArchive(searchId);
+  await writeCategoriesToArchive(searchId);
 
-    return {
-        id: archiveObject.id,
-        // title: archiveObject.title
-    }; 
+  await removePostFromDB(searchId);
+  await removeCategoriesFromDB(searchId);
+
+  return { id: archiveObject.id };
 };
 
 /* edit post submit */
@@ -104,11 +108,12 @@ export const editPostModel = async(searchId, userInput) => {
 export const searchByIdModel = async(searchId) => {
     const rows = await getPostByIdWithCategories(searchId);
     const post = normalizePostsWithCategories(rows);
+    console.log("post:", post);
     const foundPost = post[0];
     console.log("User searched for: ", foundPost.title);
 
     if (!foundPost) {
-        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that id.", author: "Please try again", categories: []})
+        return {id: "", title: "Hi there.", body: "No post found with that id.", author: "Please try again", categories: []};
     };
 
     return {
@@ -126,10 +131,11 @@ export const searchByTitleModel = async(searchTerm) => {
 
     const post = normalizePostsWithCategories(rows);
     const foundPost = post[0];
+    console.log("post:", post);
     console.log("foundPost:", foundPost);
 
     if (!foundPost) {
-        return res.render("view_post.ejs", {id: "", title: "Hi there.", body: "No post found with that title.", author: "Try searching something else", categories: []})
+        return {id: "", title: "Hi there.", body: "No post found with that title.", author: "Try searching something else", categories: []};
     };
 
     return {

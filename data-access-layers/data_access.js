@@ -58,7 +58,7 @@ export async function getPostWithCategories() {
 };
 
 /* read archive DB */
-export async function removeFromDB(searchId) {
+export async function removePostFromDB(searchId) {
     try {
         const query = `DELETE FROM posts WHERE id=$1;`;
         const data = await db.query(query, [searchId]);
@@ -77,11 +77,49 @@ export async function removeFromDB(searchId) {
     };
 };
 
-export async function removeFromArchive(searchId) {
+export async function removePostFromArchive(searchId) {
     try {
         const query = `DELETE FROM posts_archive WHERE id=$1;`;
         const data = await db.query(query, [searchId]);
+        console.log("deleted from posts_archive:", data.rows[0]);
+    } catch(err) {
+        if (err.code === "ENOENT") {
+        console.error("File not found:", db.database);
+        throw new Error("Posts database file missing.");
+        }
+        if (err instanceof SyntaxError) {
+        console.error("JSON parse failed:", err);
+        throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    };
+};
+
+export async function removeCategoriesFromDB(searchId) {
+    try {
+        const query = `DELETE FROM post_categories WHERE post_id=$1;`;
+        const data = await db.query(query, [searchId]);
         console.log("deleted:", data.rows);
+    } catch(err) {
+        if (err.code === "ENOENT") {
+        console.error("File not found:", db.database);
+        throw new Error("Posts database file missing.");
+        }
+        if (err instanceof SyntaxError) {
+        console.error("JSON parse failed:", err);
+        throw new Error("Posts database is corrupted.");
+        }
+        console.error("Unexpected read error:", err);
+        throw new Error("Failed to read posts database.");
+    };
+};
+
+export async function removeCategoriesFromArchive(searchId) {
+    try {
+        const query = `DELETE FROM post_categories_archive WHERE post_id=$1;`;
+        const data = await db.query(query, [searchId]);
+        console.log("deleted from categoies_archive:", data.rows);
     } catch(err) {
         if (err.code === "ENOENT") {
         console.error("File not found:", db.database);
@@ -99,9 +137,10 @@ export async function removeFromArchive(searchId) {
 /* return post with categories by post title */
 export async function getPostByNameWithCategories(searchTerm) {
     try {
-        const query = `SELECT * FROM posts_with_categories WHERE title = $1;`;
+        const query = `SELECT * FROM posts_with_categories WHERE title ILIKE '%' || $1 || '%';`;
         const value = searchTerm;
         const data = await db.query(query, [value]);
+        console.log("searchTerm:", searchTerm);
         console.log("viewing:", data.rows);
         return data.rows;
     } catch (err) {
@@ -263,12 +302,12 @@ export async function updatePostCategories(postId, categoryIds) {
   }
 }
 
-/* write to archive DB */
-export async function writeToArchiveDB(searchId) {
+/* write post to archive DB */
+export async function writePostToArchive(searchId) {
     try {
         const query = `INSERT INTO posts_archive SELECT * FROM posts WHERE id=$1 RETURNING *;`;
         const data = await db.query(query, [searchId]);
-        console.log(data.rows[0]);
+        console.log("writing to posts_archive:",data.rows[0]);
         return data.rows[0]
     } catch(err) {
         console.error("Failed to write to archive:", err);
@@ -276,12 +315,37 @@ export async function writeToArchiveDB(searchId) {
     };
 };
 
-export async function copyToDB(searchId) {
+/* write categories to archive DB */
+export async function writeCategoriesToArchive(searchId) {
+    try {
+        const query = `INSERT INTO post_categories_archive SELECT * FROM post_categories WHERE post_id=$1 RETURNING *;`;
+        const data = await db.query(query, [searchId]);
+        console.log("Writing categories to post_categories_archive:", data.rows[0]);
+        return data.rows[0]
+    } catch(err) {
+        console.error("Failed to write to archive:", err);
+        throw new Error("Failed to write to file");
+    };
+};
+
+export async function copyPostFromArchive(searchId) {
     try {
         const query = `INSERT INTO posts SELECT * FROM posts_archive WHERE id=$1 RETURNING *;`;
         const data = await db.query(query, [searchId]);
-        console.log(data.rows[0]);
+        console.log("copying post from archive:", data.rows[0]);
         return data.rows[0]
+    } catch(err) {
+        console.error("Failed to write to archive:", err);
+        throw new Error("Failed to write to file");
+    };
+};
+
+export async function copyCategoriesFromArchive(searchId) {
+    try {
+        const query = `INSERT INTO post_categories SELECT * FROM post_categories_archive WHERE post_id=$1 RETURNING *;`;
+        const data = await db.query(query, [searchId]);
+        console.log("Copying categories from archive:", data.rows);
+        return data.rows
     } catch(err) {
         console.error("Failed to write to archive:", err);
         throw new Error("Failed to write to file");
