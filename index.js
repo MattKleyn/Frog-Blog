@@ -101,11 +101,11 @@ app.get("/edit_post/:id", ensureAuthenticated, async(req, res) => {
     try{
         console.log('Edit request for ID:', req.params.id);
         const searchId = req.params.id;
-        const postInfo = await searchByIdModel(searchId);
+        const post = await searchByIdModel(searchId);
 
         const allCategories = await getCategories();
 
-        res.render("edit_post_form.ejs", {allCategories, ...postInfo, selectedCategories: postInfo.categories, errors: [], user: req.user})         
+        res.render("post_form.ejs", {allCategories, post, selectedCategories: post.categories, errors: [], user: req.user})         
     } catch(err) {
         console.error("Failed to render requested post:", err);
         res.status(500).send("Could not load post")
@@ -155,8 +155,9 @@ app.post("/create_post", ensureAuthenticated, async(req, res) => {
         console.log("new post:", newPost);
 
         if (newPost.errors) {
-            return res.status(400).render("new_post_form.ejs", {
-                categories: newPost.categories,
+            return res.status(400).render("post_form.ejs", {
+                allCategories: newPost.categories,
+                selectedCategories:[],
                 errors: newPost.errors,
                 form: newPost.form,
             });
@@ -173,9 +174,11 @@ app.post("/create_post", ensureAuthenticated, async(req, res) => {
 app.get("/new_post_form", ensureAuthenticated, async(req, res) => {
     try {
         console.log("Display create post form");
-        const categories = await newPostFormModel();
-        res.render("new_post_form.ejs", {
-            categories, 
+        const allCategories = await newPostFormModel();
+        res.render("post_form.ejs", {
+            post: null,
+            allCategories, 
+            selectedCategories:[],
             errors: [], 
             form: {},
             user: req.user

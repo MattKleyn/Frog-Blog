@@ -1,0 +1,33 @@
+<%- include("partials/header.ejs") %>
+    <section class="post_details">
+        <h1><%= post ? 'Edit Post' : 'Create Post' %></h1>
+        <form name="<%= post ? 'edit_post' : 'new_post' %>" action="<%= post ? '/edit/' + post.id + '?_method=PATCH' : '/create_post' %>" method="POST">
+            <label id="title" for="title">Article name: 
+                <input type="text" name="title" class="input_field" value="<%= post ? post.title : '' %>" required>
+            </label>
+
+            <label id="body" for="body">Article body: 
+                <textarea type="text" name="body" class="input_text-body" required><%= post ? post.body : '' %></textarea> <!--Consider a way to upload a file for UX, also how to represent different sections, headings, images etc?-->
+            </label>
+
+            <label id="author" for="author">Author name: 
+                <input type="text" name="author" class="input_field" value="<%= user ? user.username : '' %>" required>
+            </label>
+            
+            <% allCategories.forEach(category => { %>
+                <label>
+                    <input type="checkbox" name="category" value="<%= category.category_id %>"
+                    <% if (selectedCategories.some(c => c.category_id == category.category_id)) { %> 
+                        checked
+                    <% } %> >
+                    <%= category.category_name %>
+                </label>
+            <% }) %>
+            
+            <div>
+                <button type="submit" name="submit_new_article" class="button_style"><%= post ? 'Update Post' : 'Create Post' %></button> 
+                <a href="/" class="button_style-ghost">Cancel</a>
+            </div>
+        </form>
+    </section>
+<%- include("partials/footer.ejs") %>
