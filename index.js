@@ -6,10 +6,10 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import bcrypt from "bcrypt";
+import GoogleStrategy from "passport-google-oauth2";
 import {getHomePageViewModel, searchByTitleModel, searchByIdModel, editPostModel, deleteAndArchiveModel, undoDeleteModel, registerUserModel, authenticateUserModel, getUserProfileModel, createNewPost, updateUserProfileModel, newPostFormModel} from "./service_access_layer/services.js";
-import { accountExists, getUser } from "./data-access-layers/data_access.js";
+import { accountExists, getUser, newUserInfo, newUserProfile, getCategories } from "./data-access-layers/data_access.js";
 import { attachUserToLocals, ensureAuthenticated } from "./middleware-layers/validatePost.js";
-import { getCategories } from "./data-access-layers/data_access.js";
 
 const app = express();
 const port = 3000;
@@ -213,6 +213,18 @@ app.get("/register_form", async(req, res) => {
     };
 });
 
+app.get("/auth/google/user_profile",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res) => {
+        res.redirect(`/user_profile/${req.user.user_id}`);
+    }
+);
+
+/* Google Oauth */
+app.get("/auth/google", passport.authenticate("google", {
+    scope: ["profile", "email"],
+}));
+
 /* logout user */
 app.get("/logout", (req, res) => {
     req.logout(function (err) {
@@ -339,6 +351,33 @@ passport.use(
             console.log(err);
             return cb(err);
         }
+    })
+);
+
+/* Google strategy */
+passport.use(
+    new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "http://localhost:3000/auth/google/user_profile",
+        userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+    }, async (accessToken, refreshToken, profile, cb) => {
+        console.log("profile", profile);
+        try{
+            const email = profile.emails[0].value;
+            const username = profile.displayName;
+            const usersArray = await accountExists(email);
+            const user = usersArray[0];
+            if (!user) {
+                const newUser = await newUserInfo(username, email, null);
+                await newUserProfile(newUser.user_id, newUser.username, newUser.email);
+                cb(null, newUser);
+            } else {
+                cb(null, user);
+            }
+        } catch (err) {
+            cb(err);
+        };
     })
 );
 
