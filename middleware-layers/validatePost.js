@@ -2,7 +2,7 @@ import {getCategoriesByIds} from "../data-access-layers/data_access.js";
 
 export function attachUserToLocals(req, res, next) {
     console.log("attachUserToLocals:", req.user);
-    res.locals.user = req.user || null; 
+    res.locals.user = req.user; 
     next();
 }
 

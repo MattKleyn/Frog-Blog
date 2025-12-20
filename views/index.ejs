@@ -1,5 +1,11 @@
 <%- include("partials/header.ejs") %>
     
+    <% 
+    const hasTitle = typeof title !== "undefined" && title !== null;
+    const hasBody = typeof body !== "undefined" && body !== null;
+    const showHeadline = hasTitle || hasBody;
+    %>
+
     <section class="newspaper_head">
         <h1 class="newspaper_name">Dev frog blog</h1>
         <p>contact info/socials</p>
@@ -7,24 +13,24 @@
     </section>
 
     <div class="main_styles">
-        <% if (title) { %>
+        <% if (showHeadline) { %>
         <section class="headline_article">
             <div class="hero">
                 <img src="/assets/20250705_103241.jpg" alt="Article hero image" class="hero_image">
                 <h1 class="hero_title">
-                    <%= title %>
+                    <%= hasTitle ? title : "No title available right now." %>
                 </h1>
-                <% if (categories && categories.length) { %>
+                <% if (Array.isArray(categories) && categories.length > 0) { %>
                     <% categories.forEach((category) => { %>
-                        <p class="pill"><%= category.category_name %></p>
+                        <p class="pill"><%= category.category_name ?? "" %></p>
                     <% }) %>
                 <% } %>
                 <h3 class="hero_author">
-                    <%= author  %>
+                    <%= (typeof author !== "undefined" && author !== null) ? author : "Anonymous author"  %>
                 </h3>
             </div>
             <p class="body">
-                <%= body %>
+                <%= hasBody ? body : "" %>
             </p>       
         </section>    
         <% } else { %>
@@ -35,23 +41,27 @@
         
         <article class="article_sidebar">
             <h2>Recent Articles</h2>
-            <p>There are currently <%= quantity %> articles to read.</p>
+            <p>There are currently <%= quantity ?? "" %> articles to read.</p>
             <ul>
-                <% recentPosts.forEach((posts) => { %>
-                <li> 
-                    <a href="/posts/<%=posts.id%>">
-                        <img src="" alt="">
-                        <h3><%= posts.title %></h3>
-                        <% if (posts.categories && posts.categories.length) { %> 
-                            <% posts.categories.forEach((category) => { %>
-                            <p class="pill"><%=category.category_name %></p>
-                            <% }) %>
-                        <% } %>
-                        <p><%= posts.body %></p>
-                        <h4><%=posts.author%></h4>
-                    </a>
-                </li>
-                <% }) %>
+                <% if (Array.isArray(recentPosts) && recentPosts.length > 0) { %> 
+                    <% recentPosts.forEach((posts) => { %>
+                    <li> 
+                        <a href="/posts/<%=posts.id%>">
+                            <img src="" alt="">
+                            <h3><%= posts.title %></h3>
+                            <% if (posts.categories && posts.categories.length) { %> 
+                                <% posts.categories.forEach((category) => { %>
+                                <p class="pill"><%= category.category_name ?? "" %></p>
+                                <% }) %>
+                            <% } %>
+                            <p><%= posts.body ?? "" %></p>
+                            <h4><%= posts.author ?? "" %></h4>
+                        </a>
+                    </li>
+                    <% }) %>
+                <% } else { %>
+                        <li>Something went wrong loading recent posts.</li>
+                <% } %>
             </ul>   
         </article>
     </div>

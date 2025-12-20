@@ -85,7 +85,10 @@ export const deleteAndArchiveModel = async(searchId) => {
   await removePostFromDB(searchId);
   await removeCategoriesFromDB(searchId);
 
-  return { id: archiveObject.id };
+  return { 
+    id: archiveObject.id,
+    title: archiveObject.title
+   };
 };
 
 /* edit post submit */

@@ -1,17 +1,22 @@
 <%- include("partials/header.ejs") %>
 
+    <% if (!user) { %>
+        <h1>Error: User not found.</h1>
+        <% return; %>
+    <% } %>
+
     <section>
         <% if (user) { %>
         <a href="/logout" role="button">Logout</a>
         <h1>User profile</h1>
-        <h3>Profile Pic: <%= user.profile_pic %></h3>
-        <h3>Email: <%= user.email %></h3>
-        <h3>Username: <%= user.username %></h3>
-        <h3>Status: <%= user.status %></h3>
-        <h3>Name: <%= user.name %></h3>
-        <h3>Surname: <%= user.surname %></h3>
-        <h3>Tech stack: <%= user.tech_stack %></h3>
-        <h3>Biography: <%= user.user_bio %></h3>
+        <h3>Profile Pic: <%= user.profile_pic ?? "" %></h3>
+        <h3>Email: <%= user.email ? user.email : "Failed to retrieve email." %></h3>
+        <h3>Username: <%= user.username ? user.username : "Failed to retrieve username." %></h3>
+        <h3>Status: <%= user.status ?? "" %></h3>
+        <h3>Name: <%= user.name ?? "" %></h3>
+        <h3>Surname: <%= user.surname ?? "" %></h3>
+        <h3>Tech stack: <%= user.tech_stack ?? "" %></h3>
+        <h3>Biography: <%= user.user_bio ?? "" %></h3>
         <h3>Job position: </h3>
         <h3>Country: </h3>
         <h3>Github profile: </h3>

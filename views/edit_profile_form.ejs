@@ -1,28 +1,33 @@
 <%- include("partials/header.ejs") %>
+    
+    <% if (!user || !user.id) { %>
+        <h1>Error: User not found.</h1>
+        <% return; %>
+    <% } %>
 
     <section class="post_details">
-        <h1>Edit user profile: <%=user.username%></h1>
+        <h1>Edit user profile: <%=user.username ?? ""%></h1>
         <form action="/update_profile/<%=user.id%>?_method=PATCH" method="POST">
             <label id="username">Username:
-                <input type="text" name="username" value="<%= user.username %>" class="input_field" required>
+                <input type="text" name="username" value="<%= user.username ?? "" %>" class="input_field" required>
             </label>            
             <label id="email">Email:
-                <input type="text" name="email" value="<%= user.email %>" class="input_field" required>
+                <input type="text" name="email" value="<%= user.email ?? "" %>" class="input_field" required>
             </label>
             <label id="status">Status:
-                <input type="text" name="status" value="<%= user.status %>" class="input_field">
+                <input type="text" name="status" value="<%= user.status ?? "" %>" class="input_field">
             </label>
             <label id="name">Name:
-                <input type="text" name="name" value="<%= user.name %>" class="input_field">
+                <input type="text" name="name" value="<%= user.name ?? "" %>" class="input_field">
             </label>
             <label id="surname">Surname:
-                <input type="text" name="surname" value="<%= user.surname %>" class="input_field">
+                <input type="text" name="surname" value="<%= user.surname ?? "" %>" class="input_field">
             </label>    
             <label id="tech_stack">Tech_stack:
-                <input type="text" name="tech_stack" value="<%= user.tech_stack %>" class="input_field">
+                <input type="text" name="tech_stack" value="<%= user.tech_stack ?? "" %>" class="input_field">
             </label>
             <label id="user_bio">Biography:
-                <textarea type="text" name="user_bio" class="input_field"><%= user.user_bio %></textarea>
+                <textarea type="text" name="user_bio" class="input_field"><%= user.user_bio ?? "" %></textarea>
             </label>             
             <div>
                 <button type="submit" name="save_changes" value="edited" class="button_style">Save Changes</button>
